@@ -65,3 +65,28 @@ const {userId}=req.params
     res.status(500).json({ message: "Errore durante l'aggiornamento dei dati" });
   }
 };
+
+export const sportPreferito = async (req, res) => {
+  const {
+    running,
+    escursione,
+    biking,
+    camminata
+  } = req.body;
+const {userId}=req.params
+
+  try {
+    await db.none(
+      `UPDATE users 
+       SET running=$1, escursione=$2, biking=$3, camminata=$4
+       WHERE id=$5`,
+      [running, escursione, biking, camminata, userId]
+    );
+
+    // Rispondi con successo
+    res.status(200).json({ message: "Dati aggiornati con successo" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Errore durante l'aggiornamento dei dati" });
+  }
+};

@@ -27,10 +27,10 @@ const setupDb = async () => {
         monitoraggio TEXT,
         gruppo TEXT,
         sfide TEXT,
-        running TEXT,
-        escursione TEXT,
-        biking TEXT,
-        camminata TEXT,
+        running BOOLEAN,
+        escursione BOOLEAN,
+        biking BOOLEAN,
+        camminata BOOLEAN,
         seguiti INTEGER[] DEFAULT ARRAY[]::INTEGER[],
         seguaci INTEGER[] DEFAULT ARRAY[]::INTEGER[]
       );

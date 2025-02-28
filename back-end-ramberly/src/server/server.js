@@ -1,7 +1,8 @@
 import express, { json } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
-import { aggiornaCaratteristiche, registrazione } from "./controllers/controllers.js";
+import { aggiornaCaratteristiche, registrazione, sportPreferito } from "./controllers/controllers.js";
+
 dotenv.config();
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(cors());
 // -----------
 app.post("/registrazione", registrazione);
 app.put('/caratteristiche/:userId', aggiornaCaratteristiche)
+app.put('/scegliSport/:userId',sportPreferito )
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);
