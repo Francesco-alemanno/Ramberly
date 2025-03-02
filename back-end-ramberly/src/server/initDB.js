@@ -4,12 +4,10 @@ import bcrypt from 'bcrypt'
 dotenv.config();
 // const url = process.env.URL; // da inizializzare
 
-// export const db = pgPromise()(
-//   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
-// );
 export const db = pgPromise()(
-  "postgres://postgres:Fingerskate1@localhost:5432/ramberly"
+  "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
 );
+
 const setupDb = async () => {
   try {
     await db.none(`
