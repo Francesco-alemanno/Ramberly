@@ -2,9 +2,7 @@ import { db } from "../initDB.js";
 import dotenv from "dotenv";
 import bcrypt from "bcrypt";
 
-
 dotenv.config();
-
 
 const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 10;
 
@@ -16,12 +14,11 @@ export const registrazione = async (req, res) => {
 
   if (userExist) {
     res.status(409).json({ message: "L'utente è già registrato" });
-  }else{
+  } else {
     try {
-    
       // 🔐 Hashiamo la password in modo sicuro
       const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-  
+
       // 💾 Inseriamo l'utente nel database
       const user = await db.one(
         `INSERT INTO users (nome, cognome, email, password) 
@@ -29,17 +26,16 @@ export const registrazione = async (req, res) => {
         RETURNING id`,
         [nome, cognome, email, hashedPassword]
       );
-  
-      res.status(201).json({ message: "Utente creato con successo", userId: user.id });
-  
+
+      res
+        .status(201)
+        .json({ message: "Utente creato con successo", userId: user.id });
     } catch (err) {
       console.error("Errore durante la registrazione:", err);
       res.status(500).json({ message: "Errore durante la registrazione" });
     }
   }
-  
 };
-
 
 export const aggiornaCaratteristiche = async (req, res) => {
   const { sesso, peso, eta, attivita, monitoraggio, gruppo, sfide } = req.body;
@@ -88,8 +84,6 @@ export const scegliAvatar = async (req, res) => {
   const { img } = req.body;
 
   try {
-    
-
     await db.none(
       `UPDATE users 
        SET img=$1
@@ -109,17 +103,20 @@ export const scegliAvatar = async (req, res) => {
 // flusso login
 export const login = async (req, res) => {
   const { email, password } = req.body;
-  const passwordMatch = await bcrypt.compare(password, user.password);
 
   try {
     const user = await db.oneOrNone(
-      "SELECT * FROM users WHERE email=$1 AND password=$2",
-      [email, passwordMatch]
+      "SELECT * FROM users WHERE email=$1",
+      [email]
     );
     if (!user) {
       return res
         .status(400)
         .json({ message: "credenziali errate o user non esistente" });
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(400).json({ message: "Credenziali errate" });
     }
     return res.status(200).json({ message: "login effettuato con successo" });
   } catch (error) {
