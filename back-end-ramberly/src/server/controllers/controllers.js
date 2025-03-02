@@ -1,54 +1,49 @@
 import { db } from "../initDB.js";
+import dotenv from "dotenv";
+import bcrypt from "bcrypt";
+
+
+dotenv.config();
+
+
+const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 10;
 
 export const registrazione = async (req, res) => {
-  const {
-    nome,
-    cognome,
+  const { nome, cognome, email, password } = req.body;
+  const userExist = await db.oneOrNone(`SELECT * FROM users WHERE email=$1`, [
     email,
-    password,
-  } = req.body;
+  ]);
 
- 
-  const user = await db.oneOrNone(
-    `SELECT * FROM users WHERE email=$1`,
-    [email]
-  );
-
-  if (user) {
-    
+  if (userExist) {
     res.status(409).json({ message: "L'utente è già registrato" });
-  } else {
+  }else{
     try {
-      
-      const step1 = await db.one(
+    
+      // 🔐 Hashiamo la password in modo sicuro
+      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
+  
+      // 💾 Inseriamo l'utente nel database
+      const user = await db.one(
         `INSERT INTO users (nome, cognome, email, password) 
         VALUES ($1, $2, $3, $4) 
-        RETURNING id`, 
-        [nome, cognome, email, password]
+        RETURNING id`,
+        [nome, cognome, email, hashedPassword]
       );
-
-       const userId = step1.id;
-       
-      res.status(201).json({ message: "Utente creato con successo", userId });
+  
+      res.status(201).json({ message: "Utente creato con successo", userId: user.id });
+  
     } catch (err) {
-      console.error(err);
+      console.error("Errore durante la registrazione:", err);
       res.status(500).json({ message: "Errore durante la registrazione" });
     }
-    
   }
+  
 };
 
+
 export const aggiornaCaratteristiche = async (req, res) => {
-  const {
-    sesso,
-    peso,
-    eta,
-    attivita,
-    monitoraggio,
-    gruppo,
-    sfide,
-  } = req.body;
-const {userId}=req.params
+  const { sesso, peso, eta, attivita, monitoraggio, gruppo, sfide } = req.body;
+  const { userId } = req.params;
 
   try {
     await db.none(
@@ -58,22 +53,18 @@ const {userId}=req.params
       [sesso, peso, eta, attivita, monitoraggio, gruppo, sfide, userId]
     );
 
-    // Rispondi con successo
     res.status(200).json({ message: "Dati aggiornati con successo" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Errore durante l'aggiornamento dei dati" });
+    res
+      .status(500)
+      .json({ message: "Errore durante l'aggiornamento dei dati" });
   }
 };
 
 export const sportPreferito = async (req, res) => {
-  const {
-    running,
-    escursione,
-    biking,
-    camminata
-  } = req.body;
-const {userId}=req.params
+  const { running, escursione, biking, camminata } = req.body;
+  const { userId } = req.params;
 
   try {
     await db.none(
@@ -83,10 +74,55 @@ const {userId}=req.params
       [running, escursione, biking, camminata, userId]
     );
 
-    // Rispondi con successo
     res.status(200).json({ message: "Dati aggiornati con successo" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ message: "Errore durante l'aggiornamento dei dati" });
+    res
+      .status(500)
+      .json({ message: "Errore durante l'aggiornamento dei dati" });
+  }
+};
+
+export const scegliAvatar = async (req, res) => {
+  const { userId } = req.params;
+  const { img } = req.body;
+
+  try {
+    
+
+    await db.none(
+      `UPDATE users 
+       SET img=$1
+       WHERE id=$2`,
+      [img, userId]
+    );
+
+    res.status(200).json({ message: "Avatar aggiornato con successo" });
+  } catch (error) {
+    console.error("Errore aggiornamento avatar:", error);
+    res
+      .status(500)
+      .json({ message: "Errore durante l'aggiornamento dell'avatar." });
+  }
+};
+
+// flusso login
+export const login = async (req, res) => {
+  const { email, password } = req.body;
+  const passwordMatch = await bcrypt.compare(password, user.password);
+
+  try {
+    const user = await db.oneOrNone(
+      "SELECT * FROM users WHERE email=$1 AND password=$2",
+      [email, passwordMatch]
+    );
+    if (!user) {
+      return res
+        .status(400)
+        .json({ message: "credenziali errate o user non esistente" });
+    }
+    return res.status(200).json({ message: "login effettuato con successo" });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
   }
 };
