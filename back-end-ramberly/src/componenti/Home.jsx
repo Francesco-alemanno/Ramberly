@@ -1,18 +1,20 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 import { useSwipeable } from "react-swipeable";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Home() {
-  const { userLogged, personeRandom } = useUserContext();
+  const { userLogged, personeRandom, userIdLogged } = useUserContext();
+  const [user, setUser] = useState(null);
+
   const [participatedEvents, setParticipatedEvents] = useState({});
 
   const navTo = useNavigate();
 
   const events = localStorage.getItem("eventi");
   const parseEvents = JSON.parse(events);
-  const parseUsers = JSON.parse(localStorage.getItem("users"));
-  const parseUser = JSON.parse(localStorage.getItem("user"));
+  // const parseUsers = JSON.parse(localStorage.getItem("users"));
+  // const parseUser = JSON.parse(localStorage.getItem("user"));
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -31,38 +33,63 @@ export function Home() {
     }
   };
 
-  // funzioni bottone partecipa
-  const findUser = parseUsers.findIndex(
-    (user) => user.email === parseUser.email
-  );
-
-  function handlePartecipa(evento) {
-    if (!parseUsers[findUser].eventi_preferiti) {
-      parseUsers[findUser].eventi_preferiti = [];
-    }
-    parseUsers[findUser].eventi_preferiti.push(evento);
-    localStorage.setItem("users", JSON.stringify(parseUsers));
-    setParticipatedEvents({
-      ...participatedEvents,
-      [evento.id]: true, // Aggiungi l'evento come "partecipato"
-    });
-  }
-
-  function handleRemovePartecipa(evento) {
-    if (parseUsers[findUser].eventi_preferiti) {
-      const currentEvent = parseUsers[findUser].eventi_preferiti.findIndex(
-        (index) => index.id === evento.id
+  console.log(userIdLogged);
+  const fetchUserLogged = async () => {
+    console.log("fetching..");
+    try {
+      const response = await fetch(
+        `http://localhost:5000/home/${userIdLogged}`
       );
-      if (currentEvent !== -1) {
-        parseUsers[findUser].eventi_preferiti.splice(currentEvent, 1);
-        localStorage.setItem("users", JSON.stringify(parseUsers));
+      console.log(response);
+
+      if (response.ok) {
+        const userData = await response.json();
+        console.log(userData);
+        setUser(userData);
       }
+    } catch (error) {
+      console.error(error);
     }
-    setParticipatedEvents({
-      ...participatedEvents,
-      [evento.id]: false, // Rimuovi l'evento come "partecipato"
-    });
-  }
+  };
+
+  useEffect(() => {
+    if (userIdLogged) {
+      fetchUserLogged();
+    }
+  }, [userIdLogged]);
+
+  // funzioni bottone partecipa
+  // const findUser = parseUsers.findIndex(
+  //   (user) => user.email === parseUser.email
+  // );
+
+  // function handlePartecipa(evento) {
+  //   if (!parseUsers[findUser].eventi_preferiti) {
+  //     parseUsers[findUser].eventi_preferiti = [];
+  //   }
+  //   parseUsers[findUser].eventi_preferiti.push(evento);
+  //   localStorage.setItem("users", JSON.stringify(parseUsers));
+  //   setParticipatedEvents({
+  //     ...participatedEvents,
+  //     [evento.id]: true, // Aggiungi l'evento come "partecipato"
+  //   });
+  // }
+
+  // function handleRemovePartecipa(evento) {
+  //   if (parseUsers[findUser].eventi_preferiti) {
+  //     const currentEvent = parseUsers[findUser].eventi_preferiti.findIndex(
+  //       (index) => index.id === evento.id
+  //     );
+  //     if (currentEvent !== -1) {
+  //       parseUsers[findUser].eventi_preferiti.splice(currentEvent, 1);
+  //       localStorage.setItem("users", JSON.stringify(parseUsers));
+  //     }
+  //   }
+  //   setParticipatedEvents({
+  //     ...participatedEvents,
+  //     [evento.id]: false, // Rimuovi l'evento come "partecipato"
+  //   });
+  // }
 
   return (
     <div className="home-container">
@@ -72,12 +99,12 @@ export function Home() {
         </div>
         <div className="nav-top-home-info">
           <div>
-            <h3>{userLogged.nome}</h3>
-            <h5>Livello {userLogged.livello}</h5>
+            <h3>{user.nome}</h3>
+            <h5>Livello {user.livello}</h5>
           </div>
           <img
             id="home-user-avatar"
-            src={userLogged.img}
+            src={user.img}
             alt="user-icon"
             onClick={() => navTo("/account")}
           />
@@ -98,12 +125,12 @@ export function Home() {
                   <div className="nav-post-user-info">
                     <img
                       id="post-avatar"
-                      src={personeRandom[index]?.img || userLogged.img}
+                      src={personeRandom[index]?.img || user.img}
                       alt="user-icon"
                     />
                     <div className="post-info-container">
                       <div className="post-user-info">
-                        <h3>{personeRandom[index]?.nome || userLogged.nome}</h3>
+                        <h3>{personeRandom[index]?.nome || user.nome}</h3>
                         <h5 style={{ color: "#f7a441" }}>Amici</h5>
                         <a>
                           <img
@@ -114,8 +141,7 @@ export function Home() {
                         </a>
                       </div>
                       <h5>
-                        Livello{" "}
-                        {personeRandom[index]?.livello || userLogged.livello}
+                        Livello {personeRandom[index]?.livello || user.livello}
                       </h5>
                     </div>
                   </div>

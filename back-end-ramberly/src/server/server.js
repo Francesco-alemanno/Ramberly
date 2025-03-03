@@ -3,12 +3,12 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {
   aggiornaCaratteristiche,
+  getLoggedUser,
   login,
   registrazione,
   scegliAvatar,
   sportPreferito,
 } from "./controllers/controllers.js";
-
 
 dotenv.config();
 
@@ -23,11 +23,15 @@ app.use(cors());
 app.post("/registrazione", registrazione);
 app.put("/caratteristiche/:userId", aggiornaCaratteristiche);
 app.put("/scegliSport/:userId", sportPreferito);
-app.put('/scegliAvatar/:userId', scegliAvatar )
+app.put("/scegliAvatar/:userId", scegliAvatar);
 // ------------
 
 // flusso login
-app.post('/login', login )
+app.post("/login", login);
+
+//flusso home
+app.get("/home/:userId", getLoggedUser);
+
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);

@@ -105,10 +105,9 @@ export const login = async (req, res) => {
   const { email, password } = req.body;
 
   try {
-    const user = await db.oneOrNone(
-      "SELECT * FROM users WHERE email=$1",
-      [email]
-    );
+    const user = await db.oneOrNone(`SELECT * FROM users WHERE email=$1`, [
+      email,
+    ]);
     if (!user) {
       return res
         .status(400)
@@ -118,8 +117,26 @@ export const login = async (req, res) => {
     if (!passwordMatch) {
       return res.status(400).json({ message: "Credenziali errate" });
     }
-    return res.status(200).json({ message: "login effettuato con successo" });
+    return res
+      .status(200)
+      .json({ message: "login effettuato con successo", userId: user.id });
   } catch (error) {
     return res.status(500).json({ message: error.message });
+  }
+};
+
+//flusso home
+export const getLoggedUser = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const userLogged = await db.oneOrNone(`SELECT * FROM users WHERE id=$1`, [
+      userId,
+    ]);
+    if (userLogged) {
+      return res.status(200).json(userLogged);
+    }
+    return res.status(404).json({ message: "utente non trovato" });
+  } catch (error) {
+    res.status(500).json({ message: "errore nella richiesta", error });
   }
 };

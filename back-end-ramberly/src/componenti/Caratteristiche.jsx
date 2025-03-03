@@ -12,8 +12,8 @@ export function Caratteristiche() {
     sfide: "",
   });
 
-  const {userId}=useUserContext()
-const [message, setMessage]=useState('')
+  const { userId } = useUserContext();
+  const [message, setMessage] = useState("");
   const navTo = useNavigate();
 
   const navToRegistrazione = () => {
@@ -36,11 +36,14 @@ const [message, setMessage]=useState('')
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
-      const response = await fetch(`http://localhost:5000/caratteristiche/${userId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(caratteristiche),
-      });
+      const response = await fetch(
+        `http://localhost:5000/caratteristiche/${userId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(caratteristiche),
+        }
+      );
 
       let responseData;
       try {
@@ -64,12 +67,12 @@ const [message, setMessage]=useState('')
     setCaratteristiche({
       sesso: "",
       peso: "",
-      eta:'',
+      eta: "",
       attivita: "",
       monitoraggio: "",
       gruppo: "",
       sfide: "",
-    })
+    });
   };
 
   return (
@@ -105,7 +108,12 @@ const [message, setMessage]=useState('')
       />
       <form className="form" onSubmit={handleSubmit}>
         <label>Sesso:</label>
-        <select id="sesso" value={caratteristiche.sesso} required onChange={handleChange}>
+        <select
+          id="sesso"
+          value={caratteristiche.sesso}
+          required
+          onChange={handleChange}
+        >
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="M">Uomo</option>
@@ -140,7 +148,12 @@ const [message, setMessage]=useState('')
         />
 
         <label>Quanto spesso fai attività fisica?</label>
-        <select id="attivita" value={caratteristiche.attivita} required onChange={handleChange}>
+        <select
+          id="attivita"
+          value={caratteristiche.attivita}
+          required
+          onChange={handleChange}
+        >
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="0">Quasi mai</option>
@@ -152,7 +165,12 @@ const [message, setMessage]=useState('')
         <label>
           Hai esperienza con il monitoraggio delle attività fisiche?
         </label>
-        <select id="monitoraggio" value={caratteristiche.monitoraggio}required onChange={handleChange}>
+        <select
+          id="monitoraggio"
+          value={caratteristiche.monitoraggio}
+          required
+          onChange={handleChange}
+        >
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="si">Si</option>
@@ -160,7 +178,12 @@ const [message, setMessage]=useState('')
         </select>
 
         <label>Ti piace allenarti da solo o in gruppo?</label>
-        <select id="gruppo" value={caratteristiche.gruppo} required onChange={handleChange}>
+        <select
+          id="gruppo"
+          value={caratteristiche.gruppo}
+          required
+          onChange={handleChange}
+        >
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="solo">Solo</option>
@@ -171,7 +194,12 @@ const [message, setMessage]=useState('')
         <label>
           Ti piacerebbe partecipare partecipare a sfide o gare tramite l'app?
         </label>
-        <select id="sfide" value={caratteristiche.sfide} required onChange={handleChange}>
+        <select
+          id="sfide"
+          value={caratteristiche.sfide}
+          required
+          onChange={handleChange}
+        >
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="si">Si</option>

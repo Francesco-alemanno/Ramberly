@@ -1,16 +1,18 @@
 import { useContext } from "react";
 import { useState } from "react";
-import { UserContext } from "../contesti/useContext";
+import { UserContext, useUserContext } from "../contesti/useContext";
 import { Link, useNavigate } from "react-router-dom";
 
 export function Login() {
+  const { setUserIdLogged } = useUserContext();
+
   const [data, setData] = useState({
     email: "",
     password: "",
   });
 
   const [messaggio, setMessaggio] = useState("");
-  
+
   const navToDashboard = useNavigate();
 
   const handleChange = (event) => {
@@ -21,23 +23,29 @@ export function Login() {
       [name]: value,
     }));
   };
-  const handleLogin = async  (event) => {
+  const handleLogin = async (event) => {
     event.preventDefault();
     try {
-      const response= await fetch('http://localhost:5000/login',{
+      const response = await fetch("http://localhost:5000/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
-      })
-      if(!response.ok){
-        setMessaggio('credenziali errate o utente non esistente')
-      } else{
-        const responseData=response.json()
-        setMessaggio('login effettuato con successo')
-       navToDashboard('/home')
+      });
+      let responseData;
+      try {
+        responseData = await response.json();
+        setUserIdLogged(responseData.userId);
+      } catch (error) {
+        throw new Error(error.message);
+      }
+      if (!response.ok) {
+        setMessaggio("credenziali errate o utente non esistente");
+      } else {
+        setMessaggio("login effettuato con successo");
+        navToDashboard("/home");
       }
     } catch (error) {
-      setMessaggio(error.message)
+      setMessaggio(error.message);
     }
   };
 
@@ -69,7 +77,10 @@ export function Login() {
 
         <button type="submit">Login</button>
         <p>
-          Non sei registrato? <Link to="/registrazione" style={{color:'#F7A441'}} >Registrati</Link>
+          Non sei registrato?{" "}
+          <Link to="/registrazione" style={{ color: "#F7A441" }}>
+            Registrati
+          </Link>
         </p>
         {messaggio && (
           <p className="err-msg" style={{ textAlign: "center" }}>

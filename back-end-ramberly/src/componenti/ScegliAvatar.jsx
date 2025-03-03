@@ -6,15 +6,14 @@ export function ScegliAvatar() {
   const [img, setImg] = useState({
     img: "",
   });
-  const {userId}=useUserContext()
+  const { userId } = useUserContext();
   const [message, setMessage] = useState("");
   const navTo = useNavigate();
 
-  
   function handleImage(event) {
-    const {src, alt}=event.target
-    setImg({[alt]: src})
-    console.log(img)
+    const { src, alt } = event.target;
+    setImg({ [alt]: src });
+    console.log(img);
   }
 
   const benvenuto = () => {
@@ -100,15 +99,14 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-old-Walking-Lady.webp"
             width={70}
-            
-            alt='img'
+            alt="img"
             onClick={handleImage}
             loading="lazy"
           />
           <img
             src="\src\assets\avatar\Avatar-Senior-Helmet-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -116,7 +114,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Helmet-Male.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -124,7 +122,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Hiking-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -132,7 +130,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Hiking-Male.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -140,7 +138,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Running-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -148,7 +146,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Running-Male.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -156,7 +154,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Senior-Walking-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -164,7 +162,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Yung-Helmet-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -172,7 +170,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Yung-Helmet-Male.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -180,7 +178,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Yung-Hiking-Lady.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
@@ -188,7 +186,7 @@ export function ScegliAvatar() {
           <img
             src="\src\assets\avatar\Avatar-Yung-Hiking-Male.webp"
             width={70}
-            alt='img'
+            alt="img"
             nome={img.img}
             onClick={handleImage}
             loading="lazy"
