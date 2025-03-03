@@ -10,8 +10,7 @@ export function Login() {
   });
 
   const [messaggio, setMessaggio] = useState("");
-  const { login } = useContext(UserContext);
-
+  
   const navToDashboard = useNavigate();
 
   const handleChange = (event) => {
@@ -22,20 +21,23 @@ export function Login() {
       [name]: value,
     }));
   };
-  const handleLogin = (event) => {
+  const handleLogin = async  (event) => {
     event.preventDefault();
-    const users = localStorage.getItem("users");
-    const parseUsers = JSON.parse(users);
-    const userExist = parseUsers.find(
-      (x) => x.email === data.email && x.password === data.password
-    );
-
-    if (userExist) {
-      setMessaggio("login effettuato con successo");
-      login(userExist);
-      navToDashboard("/home");
-    } else {
-      setMessaggio("credenziali errate");
+    try {
+      const response= await fetch('http://localhost:5000/login',{
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      if(!response.ok){
+        setMessaggio('credenziali errate o utente non esistente')
+      } else{
+        const responseData=response.json()
+        setMessaggio('login effettuato con successo')
+       navToDashboard('/home')
+      }
+    } catch (error) {
+      setMessaggio(error.message)
     }
   };
 

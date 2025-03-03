@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contesti/useContext";
 
 export default function ScegliSport() {
   const [checked, setChecked] = useState({
@@ -8,7 +9,8 @@ export default function ScegliSport() {
     biking: false,
     camminata: false,
   });
-
+  const { userId } = useUserContext();
+  const [message, setMessage] = useState("");
   const navTo = useNavigate();
   const caratteristiche = () => {
     navTo("/caratteristiche");
@@ -18,9 +20,6 @@ export default function ScegliSport() {
     navTo("/potresticonoscere");
   };
 
-  const user = localStorage.getItem("user");
-  const parseUser = JSON.parse(user);
-
   const handleChange = (event) => {
     const { value, checked } = event.target;
     setChecked((prevState) => ({
@@ -29,23 +28,63 @@ export default function ScegliSport() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    try {
+      const response = await fetch(
+        `http://localhost:5000/scegliSport/${userId}`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(checked),
+        }
+      );
 
-    parseUser.sports = checked;
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (error) {
+        throw new Error(error.message);
+      }
 
-    localStorage.setItem("user", JSON.stringify(parseUser));
+      if (!response.ok) {
+        throw new Error(
+          responseData.message || "Errore durante l'inserimento dei dati."
+        );
+      }
 
-    potresticonoscere();
+      setMessage("dati inseriti con successo");
+
+      potresticonoscere();
+    } catch (error) {
+      setMessage(`inserimento dati fallito: ${error.message}`);
+    } finally {
+      setChecked({
+        running: false,
+        escursione: false,
+        biking: false,
+        camminata: false,
+      });
+    }
   };
 
   return (
     <div className="main-container">
-            <img style={{marginBottom:'20px'}} src="src/assets/loghi/logo.svg" width={160} alt="logo" />
-<img src="src/assets/icons/step2.svg" width={290} style={{marginBottom:'10px'}} alt="" />
+      <img
+        style={{ marginBottom: "20px" }}
+        src="src/assets/loghi/logo.svg"
+        width={160}
+        alt="logo"
+      />
+      <img
+        src="src/assets/icons/step2.svg"
+        width={290}
+        style={{ marginBottom: "10px" }}
+        alt=""
+      />
       <div className="form">
         <div className="scegli-sport-title">
-        <a
+          <a
             href="/caratteristiche"
             className="link-class"
             onClick={caratteristiche}
@@ -65,11 +104,8 @@ export default function ScegliSport() {
             </svg>
           </a>
 
-        <h3 className="link-h3-class">Scegli il tuo sport preferito!</h3>
-
+          <h3 className="link-h3-class">Scegli il tuo sport preferito!</h3>
         </div>
-
-       
 
         <form className="form-sports" onSubmit={handleSubmit}>
           <div className="sports-input">
@@ -142,6 +178,7 @@ export default function ScegliSport() {
           <button type="submit" className="prosegui">
             Avanti
           </button>
+          {message && <p>{message}</p>}
         </form>
       </div>
     </div>

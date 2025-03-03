@@ -1,13 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contesti/useContext";
 
 export function Caratteristiche() {
-  const users = localStorage.getItem("users");
-  const parseUsers = JSON.parse(users);
-
-  const user = localStorage.getItem("user");
-  const parseUser = JSON.parse(user);
-
   const [caratteristiche, setCaratteristiche] = useState({
     sesso: "",
     peso: "",
@@ -17,6 +12,8 @@ export function Caratteristiche() {
     sfide: "",
   });
 
+  const {userId}=useUserContext()
+const [message, setMessage]=useState('')
   const navTo = useNavigate();
 
   const navToRegistrazione = () => {
@@ -36,21 +33,43 @@ export function Caratteristiche() {
     }));
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
+    try {
+      const response = await fetch(`http://localhost:5000/caratteristiche/${userId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(caratteristiche),
+      });
 
-    const userIdExist = parseUsers.find((x) => x.id === caratteristiche.id);
-    console.log(userIdExist);
+      let responseData;
+      try {
+        responseData = await response.json();
+      } catch (error) {
+        throw new Error(error.message);
+      }
 
-    // userIdExist.push(caratteristiche)
-    // ;
+      if (!response.ok) {
+        throw new Error(
+          responseData.message || "Errore durante l'inserimento dei dati."
+        );
+      }
 
-    const userUpdated = { ...parseUser, ...caratteristiche };
-    console.log(userUpdated);
-
-    localStorage.setItem("user", JSON.stringify(userUpdated));
-
-    navToScegliSport();
+      setMessage("dati inseriti con successo");
+      // Reset campi
+      navToScegliSport();
+    } catch (error) {
+      setMessage(`inserimento dati fallito: ${error.message}`);
+    }
+    setCaratteristiche({
+      sesso: "",
+      peso: "",
+      eta:'',
+      attivita: "",
+      monitoraggio: "",
+      gruppo: "",
+      sfide: "",
+    })
   };
 
   return (
@@ -78,15 +97,19 @@ export function Caratteristiche() {
         <h3 className="link-h3-class">Le tue caratteristiche!</h3>
         <img src="src/assets/loghi/logo.svg" width={60} alt="logo" />
       </div>
-<img src="src/assets/icons/step1.svg" width={350} style={{marginBottom:'10px'}} alt="step1" />
+      <img
+        src="src/assets/icons/step1.svg"
+        width={350}
+        style={{ marginBottom: "10px" }}
+        alt="step1"
+      />
       <form className="form" onSubmit={handleSubmit}>
-       
         <label>Sesso:</label>
-        <select id="sesso" required onChange={handleChange}>
+        <select id="sesso" value={caratteristiche.sesso} required onChange={handleChange}>
           Scegli un opzione:
           <option value="">Seleziona</option>
-          <option value="uomo">Uomo</option>
-          <option value="donna">Donna</option>
+          <option value="M">Uomo</option>
+          <option value="F">Donna</option>
         </select>
         <p style={{ color: "red", fontSize: "12px" }}>
           * l'informazione riguardo il sesso è determinante per stabilire i
@@ -99,6 +122,7 @@ export function Caratteristiche() {
           type="number"
           required
           id="peso"
+          value={caratteristiche.peso}
           min={35}
           max={180}
           onChange={handleChange}
@@ -108,6 +132,7 @@ export function Caratteristiche() {
         <input
           type="number"
           required
+          value={caratteristiche.eta}
           id="eta"
           min={16}
           max={100}
@@ -115,7 +140,7 @@ export function Caratteristiche() {
         />
 
         <label>Quanto spesso fai attività fisica?</label>
-        <select id="attivita" required onChange={handleChange}>
+        <select id="attivita" value={caratteristiche.attivita} required onChange={handleChange}>
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="0">Quasi mai</option>
@@ -127,7 +152,7 @@ export function Caratteristiche() {
         <label>
           Hai esperienza con il monitoraggio delle attività fisiche?
         </label>
-        <select id="monitoraggio" required onChange={handleChange}>
+        <select id="monitoraggio" value={caratteristiche.monitoraggio}required onChange={handleChange}>
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="si">Si</option>
@@ -135,7 +160,7 @@ export function Caratteristiche() {
         </select>
 
         <label>Ti piace allenarti da solo o in gruppo?</label>
-        <select id="gruppo" required onChange={handleChange}>
+        <select id="gruppo" value={caratteristiche.gruppo} required onChange={handleChange}>
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="solo">Solo</option>
@@ -146,7 +171,7 @@ export function Caratteristiche() {
         <label>
           Ti piacerebbe partecipare partecipare a sfide o gare tramite l'app?
         </label>
-        <select id="sfide" required onChange={handleChange}>
+        <select id="sfide" value={caratteristiche.sfide} required onChange={handleChange}>
           Scegli un opzione:
           <option value="">Seleziona</option>
           <option value="si">Si</option>
@@ -156,6 +181,7 @@ export function Caratteristiche() {
         <button type="submit" className="prosegui">
           Avanti
         </button>
+        {message && <p>{message}</p>}
       </form>
     </div>
   );

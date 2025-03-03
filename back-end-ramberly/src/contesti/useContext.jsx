@@ -8,6 +8,7 @@ export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
 
 export function UserProvider({ children }) {
+  const [userId, setUserId]=useState(null) // aggiornamento stato id
   const [userLogged, setUserLogged] = useState(() => {
     const data = localStorage.getItem("user");
     return data ? JSON.parse(data) : null;
@@ -75,6 +76,8 @@ export function UserProvider({ children }) {
         setIsLogged,
         pers,
         personeRandom,
+        setUserId,
+        userId
       }}
     >
       {children}

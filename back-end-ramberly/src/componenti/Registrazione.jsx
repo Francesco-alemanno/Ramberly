@@ -1,6 +1,7 @@
+
 import { useContext, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { UserContext } from "../contesti/useContext";
+import { useUserContext } from "../contesti/useContext";
 
 export function Registrazione() {
   const [data, setData] = useState({
@@ -9,11 +10,8 @@ export function Registrazione() {
     email: "",
     password: "",
   });
-  const [errore, setErrore] = useState("");
-  const [errorEmail, setErrorEmail] = useState("");
-  const { setIsLogged } = useContext(UserContext);
-
-  setIsLogged(true);
+const {setUserId}=useUserContext()
+  const [message, setMessage] = useState("");
 
   const navToCaratteristiche = useNavigate();
 
@@ -25,11 +23,11 @@ export function Registrazione() {
         !/\d/.test(value) ||
         !/[!@#$%^&*()]/.test(value)
       ) {
-        setErrore(
+        setMessage(
           "La password deve contenere almeno sei caratteri di cui almeno un carattere speciale e una lettera maiuscola"
         );
       } else {
-        setErrore("");
+        setMessage("");
       }
     }
     setData((prevData) => ({
@@ -38,41 +36,40 @@ export function Registrazione() {
     }));
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    if (errore) return;
+    try {
+      const response = await fetch(`http://localhost:5000/registrazione`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
 
-    const existData = localStorage.getItem("users");
-    let utentiRegistrati = [];
+      let responseData;
+      try {
+        responseData = await response.json();
+        setUserId(responseData.userId)
+      } catch (error) {
+        throw new Error(error.message);
+      }
 
-    if (existData) {
-      utentiRegistrati = JSON.parse(existData);
+      if (!response.ok) {
+        throw new Error(
+          responseData.message || "Errore durante la registrazione."
+        );
+      }
+
+      setMessage("Registrazione effettuata con successo");
+      setData({
+        nome: "",
+        cognome: "",
+        email: "",
+        password: "",
+      }); // Reset campi
+      navToCaratteristiche("/caratteristiche");
+    } catch (error) {
+      setMessage(`Registrazione fallita: ${error.message}`);
     }
-
-    const existEmail = utentiRegistrati.some((x) => x.email === data.email);
-
-    if (existEmail) {
-      setErrorEmail("Email già registrata");
-      return;
-    }
-
-    const newIdUser = {
-      ...data,
-      id: utentiRegistrati.length + 1,
-    };
-
-    localStorage.setItem("user", JSON.stringify(data));
-
-    localStorage.setItem("users", JSON.stringify(utentiRegistrati));
-
-    setData({
-      nome: "",
-      cognome: "",
-      email: "",
-      password: "",
-    });
-
-    navToCaratteristiche("/caratteristiche");
   };
 
   return (
@@ -125,20 +122,28 @@ export function Registrazione() {
           value={data.password}
           required
         />
-        {errore && <p className="err-msg"> {errore}</p>}
-        {errorEmail && <p className="err-msg"> {errorEmail}</p>}
+
+        {message && <p className="err-msg"> {message}</p>}
+
         <button
           className="prosegui"
-          disabled={errore ? true : false}
+          disabled={message ? true : false}
           type="submit"
         >
           Avanti
         </button>
         <p>
-          Hai già un account? <Link to="/login" style={{color:'#F7A441'}}>Login</Link>
+          Hai già un account?{" "}
+          <Link to="/login" style={{ color: "#F7A441" }}>
+            Login
+          </Link>
         </p>
       </form>
-      <img src="src\assets\loghi\freccia.svg" style={{position:'absolute', top:'695px', zIndex:'-1'}} alt="freccia trasparente" />
+      <img
+        src="src\assets\loghi\freccia.svg"
+        style={{ position: "absolute", top: "695px", zIndex: "-1" }}
+        alt="freccia trasparente"
+      />
     </div>
   );
 }
