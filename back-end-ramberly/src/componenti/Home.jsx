@@ -4,17 +4,16 @@ import { useSwipeable } from "react-swipeable";
 import { useEffect, useRef, useState } from "react";
 
 export function Home() {
-  const { personeRandom, userIdLogged } = useUserContext();
+  const navTo = useNavigate();
+
+  const { personeRandom, userIdLogged, users, events } = useUserContext();
   const [user, setUser] = useState({});
 
   const [participatedEvents, setParticipatedEvents] = useState({});
 
-  const navTo = useNavigate();
-
-  const events = localStorage.getItem("eventi");
-  const parseEvents = JSON.parse(events);
+  // const events = localStorage.getItem("eventi");
+  // const parseEvents = JSON.parse(events);
   // const parseUsers = JSON.parse(localStorage.getItem("users"));
-  // const parseUser = JSON.parse(localStorage.getItem("user"));
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -25,7 +24,7 @@ export function Home() {
   });
 
   const handleSwipe = (direction) => {
-    if (direction === "left" && currentIndex < parseEvents.length - 1) {
+    if (direction === "left" && currentIndex < events.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
     if (direction === "right" && currentIndex > 0) {
@@ -33,7 +32,7 @@ export function Home() {
     }
   };
 
-  // chiamata fetch
+  // chiamata fetch utente loggato
   const isMounted = useRef(true); // 👈 Evita il problema del componente smontato
   useEffect(() => {
     isMounted.current = true; // Assicura che il componente sia montato
@@ -92,6 +91,8 @@ export function Home() {
   //   });
   // }
 
+  console.log(events);
+
   return (
     <div className="home-container">
       <div className="nav-top-home">
@@ -119,7 +120,7 @@ export function Home() {
             transition: "transform 0.3s ease-out",
           }}
         >
-          {parseEvents.map((evento, index) => (
+          {events.map((evento, index) => (
             <div key={evento.id} className="home-slide">
               <div className="home">
                 <div className="nav-post">
@@ -246,7 +247,7 @@ export function Home() {
         </div>
       </div>
       <div className="carousel-dots">
-        {parseEvents.map((_, index) => (
+        {events.map((_, index) => (
           <span
             key={index}
             className={`dot ${index === currentIndex ? "active" : ""}`}

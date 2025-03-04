@@ -3,6 +3,8 @@ import cors from "cors";
 import dotenv from "dotenv";
 import {
   aggiornaCaratteristiche,
+  getAllEvents,
+  getAllUsers,
   getLoggedUser,
   login,
   registrazione,
@@ -31,6 +33,8 @@ app.post("/login", login);
 
 //flusso home
 app.get("/home/:userId", getLoggedUser);
+app.get("/users", getAllUsers);
+app.get("/events", getAllEvents);
 
 // LISTEN
 app.listen(PORT, () => {

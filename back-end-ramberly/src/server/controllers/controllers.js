@@ -140,3 +140,21 @@ export const getLoggedUser = async (req, res) => {
     res.status(500).json({ message: "errore nella richiesta", error });
   }
 };
+
+export const getAllUsers = async (req, res) => {
+  try {
+    const users = await db.many(`SELECT * FROM users`);
+    return res.status(200).json(users);
+  } catch (error) {
+    return res.status(500).json({ message: "errore nella richiesta", error });
+  }
+};
+
+export const getAllEvents = async (req, res) => {
+  try {
+    const events = await db.many(`SELECT * FROM eventi`);
+    return res.status(200).json(events);
+  } catch (error) {
+    return res.status(500).json({ message: "errore nella richiesta", error });
+  }
+};

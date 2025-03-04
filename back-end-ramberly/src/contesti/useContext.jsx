@@ -11,11 +11,9 @@ export function UserProvider({ children }) {
   const [userId, setUserId] = useState(null); // aggiornamento stato id
   const [userIdLogged, setUserIdLogged] = useState(null);
 
-  const [userLogged, setUserLogged] = useState(() => {
-    const data = localStorage.getItem("user");
-    return data ? JSON.parse(data) : null;
-  });
-  const [isLogged, setIsLogged] = useState(false);
+  const [users, setUsers] = useState([]);
+  const [events, setEvents] = useState([]);
+
   const [pers, setPers] = useState(persone);
   const [eventi, setEventi] = useState(eventiArr);
   const [personeRandom, setPersoneRandom] = useState(() => {
@@ -37,28 +35,35 @@ export function UserProvider({ children }) {
     localStorage.setItem("personeRandom", JSON.stringify(utentiPostCasuali));
   }, []);
 
+  // fetch users dal database
+  const fetchAllUsers = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/users`);
+      if (!response.ok) {
+        throw new Error("Errore nella risposta");
+      }
+      const usersData = await response.json();
+      setUsers(usersData);
+    } catch (error) {
+      console.error({ message: "errore nel fetching", error });
+    }
+  };
+
   useEffect(() => {
-    localStorage.setItem("users", JSON.stringify(pers));
-
-    const users = localStorage.getItem("users");
-    const parseUsers = JSON.parse(users);
-
-    setPers((pre) => [...pre, parseUsers]);
-    localStorage.setItem("users", JSON.stringify(pers)); //pers è un array non è una persona singola
+    fetchAllUsers();
   }, []);
 
-  const login = (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
-    setUserLogged(user);
-    setIsLogged(true);
-  };
+  // useEffect(() => {
+  //   localStorage.setItem("users", JSON.stringify(pers));
 
-  const logout = () => {
-    localStorage.removeItem("user");
-    setUserLogged(null);
-    setIsLogged(false);
-  };
+  //   const users = localStorage.getItem("users");
+  //   const parseUsers = JSON.parse(users);
 
+  //   setPers((pre) => [...pre, parseUsers]);
+  //   localStorage.setItem("users", JSON.stringify(pers)); //pers è un array non è una persona singola
+  // }, []);
+
+  // fetch eventi dal database
   useEffect(() => {
     localStorage.setItem("eventi", JSON.stringify(eventi));
     const events = localStorage.getItem("eventi");
@@ -68,20 +73,34 @@ export function UserProvider({ children }) {
     localStorage.setItem("eventi", JSON.stringify(eventi));
   }, []);
 
+  const fetchAllEvents = async () => {
+    try {
+      const response = await fetch(`http://localhost:5000/events`);
+      if (!response.ok) {
+        throw new Error("Errore nella risposta");
+      }
+      const eventsData = await response.json();
+      setEvents(eventsData);
+    } catch (error) {
+      console.error({ message: "errore nel fetching", error });
+    }
+  };
+
+  useEffect(() => {
+    fetchAllEvents();
+  }, []);
+
   return (
     <UserContext.Provider
       value={{
-        login,
-        logout,
-        userLogged,
-        isLogged,
-        setIsLogged,
         pers,
         personeRandom,
         setUserId,
         userId,
         userIdLogged,
         setUserIdLogged,
+        users,
+        events,
       }}
     >
       {children}
