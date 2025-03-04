@@ -1,11 +1,11 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 import { useSwipeable } from "react-swipeable";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function Home() {
-  const { userLogged, personeRandom, userIdLogged } = useUserContext();
-  const [user, setUser] = useState(null);
+  const { personeRandom, userIdLogged } = useUserContext();
+  const [user, setUser] = useState({});
 
   const [participatedEvents, setParticipatedEvents] = useState({});
 
@@ -33,30 +33,31 @@ export function Home() {
     }
   };
 
-  console.log(userIdLogged);
-  const fetchUserLogged = async () => {
-    console.log("fetching..");
-    try {
-      const response = await fetch(
-        `http://localhost:5000/home/${userIdLogged}`
-      );
-      console.log(response);
-
-      if (response.ok) {
-        const userData = await response.json();
-        console.log(userData);
-        setUser(userData);
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  };
-
+  // chiamata fetch
+  const isMounted = useRef(true); // 👈 Evita il problema del componente smontato
   useEffect(() => {
-    if (userIdLogged) {
-      fetchUserLogged();
-    }
-  }, [userIdLogged]);
+    isMounted.current = true; // Assicura che il componente sia montato
+
+    const fetchUserLogged = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/home/${userIdLogged}`
+        );
+        if (!response.ok) throw new Error("Errore nella risposta");
+        const userData = await response.json();
+        if (isMounted.current) {
+          setUser(userData);
+        }
+      } catch (error) {
+        console.error("Errore nel fetching dati:", error);
+      }
+    };
+    fetchUserLogged();
+
+    return () => {
+      isMounted.current = false; // Evita di aggiornare lo stato se il componente si smonta
+    };
+  }, [userIdLogged]); // 👈 Mantieni solo `userIdLogged` come dipendenza
 
   // funzioni bottone partecipa
   // const findUser = parseUsers.findIndex(

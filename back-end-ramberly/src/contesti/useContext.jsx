@@ -10,7 +10,6 @@ export const useUserContext = () => useContext(UserContext);
 export function UserProvider({ children }) {
   const [userId, setUserId] = useState(null); // aggiornamento stato id
   const [userIdLogged, setUserIdLogged] = useState(null);
-  console.log(userIdLogged);
 
   const [userLogged, setUserLogged] = useState(() => {
     const data = localStorage.getItem("user");
