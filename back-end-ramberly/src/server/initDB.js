@@ -1,6 +1,6 @@
 import pgPromise from "pg-promise";
 import dotenv from "dotenv";
-import bcrypt from 'bcrypt'
+import bcrypt from "bcrypt";
 dotenv.config();
 // const url = process.env.URL; // da inizializzare
 
@@ -56,7 +56,7 @@ VALUES
         nome_evento TEXT,
         start TEXT,
         finish TEXT,
-        img BYTEA,
+        img TEXT,
         distanza DECIMAL(10,2),
         orario TIME,
         data DATE,
@@ -65,6 +65,49 @@ VALUES
         difficolta CHAR(1)
       );
     `);
+    await db.none(`INSERT INTO eventi (id_evento,id_creatore,nome_evento, start, finish, img, distanza, orario, data,partecipanti, privacy,difficolta) VALUES
+(
+  1,
+  1,
+  'corsetta mattutina',
+  'Via della Moscova, Milano',
+  'Corso Como, Milano',
+  'src/assets/placeholder-mappa/map-placeholder.png',
+  12.2,
+  '16:00',
+  '2025-02-24',
+  ARRAY[2,3]::INTEGER[],
+  '1',
+  NULL
+),
+(
+  2,
+  1,
+  'corsetta pomeridiana',
+  'Via del Corso, Roma',
+  'Via dei Condotti, Roma',
+  'src/assets/placeholder-mappa/map-placeholder(2).png',
+  8.1,
+  '15:00',
+  '2025-01-18',
+  ARRAY[4,5]::INTEGER[],
+  '1',
+  NULL
+),
+(
+  3,
+  1,
+  'passeggiata notturna',
+  'Via Roma, Torino',
+  'Via Trinchese, Torino',
+  'src/assets/placeholder-mappa/map-placeholder(3).png',
+  4.4,
+  '10:00',
+  '2025-04-05',
+  ARRAY[6,7,8,9]::INTEGER[],
+  '1',
+  NULL
+);`);
 
     console.log("Tabelle create correttamente");
   } catch (error) {
@@ -73,6 +116,3 @@ VALUES
 };
 
 setupDb();
-
-
-
