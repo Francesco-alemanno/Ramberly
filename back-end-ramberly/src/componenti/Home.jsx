@@ -8,7 +8,7 @@ export function Home() {
 
   const { personeRandom, users, events, user } = useUserContext();
 
-  const [participatedEvents, setParticipatedEvents] = useState({});
+  const [participatedEvents, setParticipatedEvents] = useState(false);
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -33,6 +33,17 @@ export function Home() {
   //   (user) => user.email === parseUser.email
   // );
 
+  async function handlePartecipa(idEvento, IdUser) {
+    const jsonData = JSON.stringify({ id: IdUser, event_id: idEvento });
+    try {
+      const response = await fetch("http://localhost:5000/events", {
+        method: "PUT",
+        body: jsonData,
+        headers: { "Content-Type": "application/json" },
+      });
+      setParticipatedEvents(true);
+    } catch (error) {}
+  }
   // function handlePartecipa(evento) {
   //   if (!parseUsers[findUser].eventi_preferiti) {
   //     parseUsers[findUser].eventi_preferiti = [];
@@ -190,9 +201,9 @@ export function Home() {
                     </div>
                   </div>
                 </div>
-                {!participatedEvents[evento.id] ? (
+                {participatedEvents ? (
                   <button
-                    onClick={() => handlePartecipa(evento)}
+                    onClick={() => handlePartecipa(evento.id, user.id)}
                     style={{ fontSize: "18px", color: "white" }}
                   >
                     Partecipa!

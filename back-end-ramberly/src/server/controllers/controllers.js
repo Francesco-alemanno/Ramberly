@@ -158,3 +158,27 @@ export const getAllEvents = async (req, res) => {
     return res.status(500).json({ message: "errore nella richiesta", error });
   }
 };
+
+export const updateEventUser = async (req, res) => {
+  const { id, event_id } = req.body;
+  try {
+    const partecipantiEvento = await db.manyOrNone(
+      `SELECT partecipanti FROM eventi WHERE id_evento=$1`,
+      [event_id]
+    );
+    const exist = partecipantiEvento[0].partecipanti.some((x) => x === id);
+    if (exist) {
+      return res.status(409).json({ message: `Utente gia partecipa` });
+    }
+    console.log(partecipantiEvento[0].partecipanti);
+
+    partecipantiEvento[0].partecipanti.push(id);
+    await db.none(`UPDATE eventi  SET partecipanti=$1  WHERE id_evento=$2`, [
+      partecipantiEvento[0].partecipanti,
+      event_id,
+    ]);
+    return res.status(200).json({ message: `utente aggiunto correttamente` });
+  } catch (error) {
+    return res.status(500).json({ message: `errore nella richiesta`, error });
+  }
+};

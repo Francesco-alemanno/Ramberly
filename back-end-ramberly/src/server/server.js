@@ -10,6 +10,7 @@ import {
   registrazione,
   scegliAvatar,
   sportPreferito,
+  updateEventUser,
 } from "./controllers/controllers.js";
 
 dotenv.config();
@@ -35,6 +36,7 @@ app.post("/login", login);
 app.get("/home/:userId", getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
+app.put("/events", updateEventUser);
 
 // LISTEN
 app.listen(PORT, () => {
