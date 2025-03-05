@@ -1,4 +1,4 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useRef } from "react";
 import { useState } from "react";
 import { createContext } from "react";
 import persone from "../database";
@@ -23,23 +23,23 @@ export function UserProvider({ children }) {
     return data ? JSON.parse(data) : [];
   });
 
-  const fetchUserLogged = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/home/${userIdLogged}`
-      );
-      if (!response.ok) throw new Error("Errore nella risposta");
-      const userData = await response.json();
-      if (isMounted.current) {
-        setUser(userData);
-      }
-    } catch (error) {
-      console.error("Errore nel fetching dati:", error);
-    }
-  };
+  // chiamata fetch
   useEffect(() => {
+    const fetchUserLogged = async () => {
+      try {
+        const response = await fetch(
+          `http://localhost:5000/home/${userIdLogged}`
+        );
+        if (!response.ok) throw new Error("Errore nella risposta");
+        const userData = await response.json();
+        setUser(userData);
+      } catch (error) {
+        console.error("Errore nel fetching dati:", error);
+      }
+    };
     fetchUserLogged();
-  }, []);
+  }, [userIdLogged]);
+
   // logica randomizzazione post utenti home e preferiti
 
   // useEffect(() => {
