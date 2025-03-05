@@ -14,26 +14,45 @@ export function UserProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
 
+  const [user, setUser] = useState({});
+
   const [pers, setPers] = useState(persone);
-  const [eventi, setEventi] = useState(eventiArr);
+  // const [eventi, setEventi] = useState(eventiArr);
   const [personeRandom, setPersoneRandom] = useState(() => {
     const data = localStorage.getItem("personeRandom");
     return data ? JSON.parse(data) : [];
   });
 
+  const fetchUserLogged = async () => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/home/${userIdLogged}`
+      );
+      if (!response.ok) throw new Error("Errore nella risposta");
+      const userData = await response.json();
+      if (isMounted.current) {
+        setUser(userData);
+      }
+    } catch (error) {
+      console.error("Errore nel fetching dati:", error);
+    }
+  };
+  useEffect(() => {
+    fetchUserLogged();
+  }, []);
   // logica randomizzazione post utenti home e preferiti
 
-  useEffect(() => {
-    localStorage.setItem("eventi", JSON.stringify(eventi));
-    const events = localStorage.getItem("eventi");
-    const parseEvents = JSON.parse(events);
-    const utentiPostCasuali = parseEvents.map(() => {
-      const indiceCasuale = Math.floor(Math.random() * pers.length);
-      return pers[indiceCasuale];
-    });
-    setPersoneRandom(utentiPostCasuali);
-    localStorage.setItem("personeRandom", JSON.stringify(utentiPostCasuali));
-  }, []);
+  // useEffect(() => {
+  //   localStorage.setItem("eventi", JSON.stringify(eventi));
+  //   const events = localStorage.getItem("eventi");
+  //   const parseEvents = JSON.parse(events);
+  //   const utentiPostCasuali = parseEvents.map(() => {
+  //     const indiceCasuale = Math.floor(Math.random() * pers.length);
+  //     return pers[indiceCasuale];
+  //   });
+  //   setPersoneRandom(utentiPostCasuali);
+  //   localStorage.setItem("personeRandom", JSON.stringify(utentiPostCasuali));
+  // }, []);
 
   // fetch users dal database
   const fetchAllUsers = async () => {
@@ -64,14 +83,14 @@ export function UserProvider({ children }) {
   // }, []);
 
   // fetch eventi dal database
-  useEffect(() => {
-    localStorage.setItem("eventi", JSON.stringify(eventi));
-    const events = localStorage.getItem("eventi");
-    const parseEvents = JSON.parse(events);
+  // useEffect(() => {
+  //   localStorage.setItem("eventi", JSON.stringify(eventi));
+  //   const events = localStorage.getItem("eventi");
+  //   const parseEvents = JSON.parse(events);
 
-    setEventi((prec) => [...prec, parseEvents]);
-    localStorage.setItem("eventi", JSON.stringify(eventi));
-  }, []);
+  //   setEventi((prec) => [...prec, parseEvents]);
+  //   localStorage.setItem("eventi", JSON.stringify(eventi));
+  // }, []);
 
   const fetchAllEvents = async () => {
     try {
@@ -101,6 +120,7 @@ export function UserProvider({ children }) {
         setUserIdLogged,
         users,
         events,
+        user,
       }}
     >
       {children}

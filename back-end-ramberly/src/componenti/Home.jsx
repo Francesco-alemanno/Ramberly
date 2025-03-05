@@ -6,14 +6,9 @@ import { useEffect, useRef, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { personeRandom, userIdLogged, users, events } = useUserContext();
-  const [user, setUser] = useState({});
+  const { personeRandom, users, events, user } = useUserContext();
 
   const [participatedEvents, setParticipatedEvents] = useState({});
-
-  // const events = localStorage.getItem("eventi");
-  // const parseEvents = JSON.parse(events);
-  // const parseUsers = JSON.parse(localStorage.getItem("users"));
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -32,33 +27,8 @@ export function Home() {
     }
   };
 
-  // chiamata fetch utente loggato
-  const isMounted = useRef(true); // 👈 Evita il problema del componente smontato
-  useEffect(() => {
-    isMounted.current = true; // Assicura che il componente sia montato
-
-    const fetchUserLogged = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/home/${userIdLogged}`
-        );
-        if (!response.ok) throw new Error("Errore nella risposta");
-        const userData = await response.json();
-        if (isMounted.current) {
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error("Errore nel fetching dati:", error);
-      }
-    };
-    fetchUserLogged();
-
-    return () => {
-      isMounted.current = false; // Evita di aggiornare lo stato se il componente si smonta
-    };
-  }, [userIdLogged]); // 👈 Mantieni solo `userIdLogged` come dipendenza
-
   // funzioni bottone partecipa
+
   // const findUser = parseUsers.findIndex(
   //   (user) => user.email === parseUser.email
   // );
@@ -91,8 +61,6 @@ export function Home() {
   //   });
   // }
 
-  console.log(events);
-
   return (
     <div className="home-container">
       <div className="nav-top-home">
@@ -121,7 +89,7 @@ export function Home() {
           }}
         >
           {events.map((evento, index) => (
-            <div key={evento.id} className="home-slide">
+            <div key={index} className="home-slide">
               <div className="home">
                 <div className="nav-post">
                   <div className="nav-post-user-info">
