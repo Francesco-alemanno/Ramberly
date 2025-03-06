@@ -32,7 +32,7 @@ export default function ScegliSport() {
     event.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5000/scegliSport/${userId}`,
+        `http://localhost:5001/scegliSport/${userId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },

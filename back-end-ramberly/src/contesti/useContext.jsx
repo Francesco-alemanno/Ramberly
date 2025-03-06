@@ -28,7 +28,7 @@ export function UserProvider({ children }) {
     const fetchUserLogged = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/home/${userIdLogged}`
+          `http://localhost:5001/home/${userIdLogged}`
         );
         if (!response.ok) throw new Error("Errore nella risposta");
         const userData = await response.json();
@@ -57,7 +57,7 @@ export function UserProvider({ children }) {
   // fetch users dal database
   const fetchAllUsers = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/users`);
+      const response = await fetch(`http://localhost:5001/users`);
       if (!response.ok) {
         throw new Error("Errore nella risposta");
       }
@@ -94,7 +94,7 @@ export function UserProvider({ children }) {
 
   const fetchAllEvents = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/events`);
+      const response = await fetch(`http://localhost:5001/events`);
       if (!response.ok) {
         throw new Error("Errore nella risposta");
       }

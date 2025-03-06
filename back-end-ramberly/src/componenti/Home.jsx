@@ -36,7 +36,7 @@ export function Home() {
   async function handlePartecipa(idEvento, IdUser) {
     const jsonData = JSON.stringify({ id: IdUser, event_id: idEvento });
     try {
-      const response = await fetch("http://localhost:5000/events", {
+      const response = await fetch("http://localhost:5001/events", {
         method: "PUT",
         body: jsonData,
         headers: { "Content-Type": "application/json" },
@@ -188,7 +188,7 @@ export function Home() {
                   <div className="info-box">
                     <img src="src\assets\icons\clock.svg" alt="orario" />
                     <div className="info-box-text">
-                      <h3>{evento.orario}</h3>
+                      <h3>{evento.orario.slice(0, -3)}</h3>
                       <span>hr</span>
                     </div>
                   </div>
@@ -196,7 +196,8 @@ export function Home() {
                   <div className="info-box">
                     <img src="/src/assets/icons/calendar.svg" alt="data" />
                     <div className="info-box-text">
-                      <h3>{evento.data}</h3>
+                      <h3>{new Date(evento.data).toLocaleDateString()}</h3>{" "}
+                      {/*Riconvertiamo in sola data*/}
                       <span>data</span>
                     </div>
                   </div>

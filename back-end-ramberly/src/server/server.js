@@ -11,6 +11,7 @@ import {
   scegliAvatar,
   sportPreferito,
   updateEventUser,
+  deleteEventUser,
 } from "./controllers/controllers.js";
 
 dotenv.config();
@@ -37,6 +38,7 @@ app.get("/home/:userId", getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
+app.delete("/events", deleteEventUser);
 
 // LISTEN
 app.listen(PORT, () => {

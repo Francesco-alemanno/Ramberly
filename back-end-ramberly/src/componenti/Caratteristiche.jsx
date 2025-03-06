@@ -37,7 +37,7 @@ export function Caratteristiche() {
     event.preventDefault();
     try {
       const response = await fetch(
-        `http://localhost:5000/caratteristiche/${userId}`,
+        `http://localhost:5001/caratteristiche/${userId}`,
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
