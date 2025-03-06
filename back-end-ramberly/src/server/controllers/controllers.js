@@ -1,10 +1,9 @@
 import { db } from "../initDB.js";
 import dotenv from "dotenv";
-import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
-
-const SALT_ROUNDS = parseInt(process.env.SALT_ROUNDS, 10) || 10;
+const { SECRET = "" } = process.env;
 
 export const registrazione = async (req, res) => {
   const { nome, cognome, email, password } = req.body;
@@ -16,15 +15,11 @@ export const registrazione = async (req, res) => {
     res.status(409).json({ message: "L'utente è già registrato" });
   } else {
     try {
-      // 🔐 Hashiamo la password in modo sicuro
-      const hashedPassword = await bcrypt.hash(password, SALT_ROUNDS);
-
-      // 💾 Inseriamo l'utente nel database
       const user = await db.one(
         `INSERT INTO users (nome, cognome, email, password) 
         VALUES ($1, $2, $3, $4) 
         RETURNING id`,
-        [nome, cognome, email, hashedPassword]
+        [nome, cognome, email, password]
       );
 
       res
@@ -108,18 +103,16 @@ export const login = async (req, res) => {
     const user = await db.oneOrNone(`SELECT * FROM users WHERE email=$1`, [
       email,
     ]);
-    if (!user) {
+    if (!user && !user.password === password) {
       return res
         .status(400)
         .json({ message: "credenziali errate o user non esistente" });
+    } else {
+      const payload = { id: user.id, email };
+      const token = jwt.sign(payload, SECRET);
+      await db.none(`UPDATE users SET token=$2 WHERE id=$1`, [user.id, token]);
+      res.status(200).json({ id: user.id, email, token });
     }
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(400).json({ message: "Credenziali errate" });
-    }
-    return res
-      .status(200)
-      .json({ message: "login effettuato con successo", userId: user.id });
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }
@@ -127,11 +120,12 @@ export const login = async (req, res) => {
 
 //flusso home
 export const getLoggedUser = async (req, res) => {
-  const { userId } = req.params;
   try {
-    const userLogged = await db.oneOrNone(`SELECT * FROM users WHERE id=$1`, [
-      userId,
-    ]);
+    const userId = req.user.id; // Ottieni l'ID utente dal token
+    const userLogged = await db.oneOrNone(
+      "SELECT id, nome, email, img, livello, sesso, peso, eta, attivita, monitoraggio, gruppo, sfide e FROM users WHERE id = $1",
+      [userId]
+    );
     if (userLogged) {
       return res.status(200).json(userLogged);
     }
@@ -192,22 +186,18 @@ export const deleteEventUser = async (req, res) => {
       [event_id]
     );
     const exist = partecipantiEvento[0].partecipanti.some((x) => x === id);
-
     if (exist) {
       const index = partecipantiEvento[0].partecipanti.findIndex(
         (x) => x === id
       );
-
       partecipantiEvento[0].partecipanti.splice(index, 1);
 
       await db.none(`UPDATE eventi  SET partecipanti=$1  WHERE id_evento=$2`, [
         partecipantiEvento[0].partecipanti,
         event_id,
       ]);
-
       return res.status(200).json({ message: `eliminato con successo` });
     }
-
     return res.status(400).json({ message: `L'utente non partecipa!` });
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });

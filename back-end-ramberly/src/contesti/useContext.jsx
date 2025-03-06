@@ -1,15 +1,13 @@
-import { useContext, useEffect, useRef } from "react";
+import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
 import persone from "../database";
-import eventiArr from "../databaseEventi";
 
 export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
 
 export function UserProvider({ children }) {
   const [userId, setUserId] = useState(null); // aggiornamento stato id
-  const [userIdLogged, setUserIdLogged] = useState(null);
 
   const [users, setUsers] = useState([]);
   const [events, setEvents] = useState([]);
@@ -17,42 +15,39 @@ export function UserProvider({ children }) {
   const [user, setUser] = useState({});
 
   const [pers, setPers] = useState(persone);
-  // const [eventi, setEventi] = useState(eventiArr);
   const [personeRandom, setPersoneRandom] = useState(() => {
     const data = localStorage.getItem("personeRandom");
     return data ? JSON.parse(data) : [];
   });
 
-  // chiamata fetch
+  // fetch login utente
+  const fetchUserLogged = async () => {
+    const token = sessionStorage.getItem("token");
+    if (!token) return;
+
+    try {
+      const response = await fetch("http://localhost:5001/home", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`, // Passa il token nel header
+        },
+      });
+
+      if (!response.ok) throw new Error("Errore nel recupero utente");
+
+      const userData = await response.json();
+      setUser(userData); // Salva l'utente nello stato globale
+    } catch (error) {
+      console.error("Errore nel fetching dati:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchUserLogged = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5001/home/${userIdLogged}`
-        );
-        if (!response.ok) throw new Error("Errore nella risposta");
-        const userData = await response.json();
-        setUser(userData);
-      } catch (error) {
-        console.error("Errore nel fetching dati:", error);
-      }
-    };
-    fetchUserLogged();
-  }, [userIdLogged]);
-
-  // logica randomizzazione post utenti home e preferiti
-
-  // useEffect(() => {
-  //   localStorage.setItem("eventi", JSON.stringify(eventi));
-  //   const events = localStorage.getItem("eventi");
-  //   const parseEvents = JSON.parse(events);
-  //   const utentiPostCasuali = parseEvents.map(() => {
-  //     const indiceCasuale = Math.floor(Math.random() * pers.length);
-  //     return pers[indiceCasuale];
-  //   });
-  //   setPersoneRandom(utentiPostCasuali);
-  //   localStorage.setItem("personeRandom", JSON.stringify(utentiPostCasuali));
-  // }, []);
+    const token = sessionStorage.getItem("token");
+    if (token) {
+      fetchUserLogged(); // Se c'è un token, carica i dati dell'utente
+    }
+  }, []);
 
   // fetch users dal database
   const fetchAllUsers = async () => {
@@ -72,26 +67,7 @@ export function UserProvider({ children }) {
     fetchAllUsers();
   }, []);
 
-  // useEffect(() => {
-  //   localStorage.setItem("users", JSON.stringify(pers));
-
-  //   const users = localStorage.getItem("users");
-  //   const parseUsers = JSON.parse(users);
-
-  //   setPers((pre) => [...pre, parseUsers]);
-  //   localStorage.setItem("users", JSON.stringify(pers)); //pers è un array non è una persona singola
-  // }, []);
-
-  // fetch eventi dal database
-  // useEffect(() => {
-  //   localStorage.setItem("eventi", JSON.stringify(eventi));
-  //   const events = localStorage.getItem("eventi");
-  //   const parseEvents = JSON.parse(events);
-
-  //   setEventi((prec) => [...prec, parseEvents]);
-  //   localStorage.setItem("eventi", JSON.stringify(eventi));
-  // }, []);
-
+  // fetch utenti dal database
   const fetchAllEvents = async () => {
     try {
       const response = await fetch(`http://localhost:5001/events`);
@@ -116,12 +92,10 @@ export function UserProvider({ children }) {
         personeRandom,
         setUserId,
         userId,
-        userIdLogged,
-        setUserIdLogged,
-
         users,
         events,
         user,
+        fetchUserLogged,
       }}
     >
       {children}

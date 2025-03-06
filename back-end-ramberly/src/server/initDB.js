@@ -20,6 +20,7 @@ const setupDb = async () => {
         cognome TEXT,
         email TEXT UNIQUE,
         password TEXT,
+        token TEXT,
         livello INTEGER DEFAULT 1,
         img BYTEA, 
         sesso TEXT,
@@ -37,7 +38,7 @@ const setupDb = async () => {
         seguaci INTEGER[] DEFAULT ARRAY[]::INTEGER[]
       );
     `);
-    //     await db.none(`INSERT INTO users (nome, cognome, email, password, livello, sesso, peso, eta, attivita, monitoraggio, gruppo, sfide, running, escursione, biking, camminata, seguiti, seguaci)
+    // await db.none(`INSERT INTO users (nome, cognome, email, password, livello, sesso, peso, eta, attivita, monitoraggio, gruppo, sfide, running, escursione, biking, camminata, seguiti, seguaci)
     // VALUES
     //     ('Luca', 'Rossi', 'luca.rossi@email.com', 'Pass123!', 3, 'M', 75, 28, '2', 'si', 'gruppo', 'si', TRUE, FALSE, FALSE, TRUE, ARRAY[2,3], ARRAY[5,6,7]),
     //     ('Giulia', 'Bianchi', 'giulia.bianchi@email.com', 'Pass123', 5, 'F', 60, 32, '4', 'si', 'entrambi', 'si', FALSE, TRUE, FALSE, TRUE, ARRAY[1,4], ARRAY[3,8]),

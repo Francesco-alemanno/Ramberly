@@ -13,6 +13,8 @@ import {
   updateEventUser,
   deleteEventUser,
 } from "./controllers/controllers.js";
+import passport from "passport";
+import "./passport.js";
 
 dotenv.config();
 
@@ -22,6 +24,7 @@ const PORT = process.env.PORT;
 // middleware
 app.use(json());
 app.use(cors());
+app.use(passport.initialize());
 // -----------
 // flusso registrazione
 app.post("/registrazione", registrazione);
@@ -34,7 +37,11 @@ app.put("/scegliAvatar/:userId", scegliAvatar);
 app.post("/login", login);
 
 //flusso home
-app.get("/home/:userId", getLoggedUser);
+app.get(
+  "/home",
+  passport.authenticate("jwt", { session: false }),
+  getLoggedUser
+);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);

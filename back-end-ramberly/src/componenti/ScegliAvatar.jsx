@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { UserContext, useUserContext } from "../contesti/useContext";
+import { useUserContext } from "../contesti/useContext";
 
 export function ScegliAvatar() {
   const [img, setImg] = useState({

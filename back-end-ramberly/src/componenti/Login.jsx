@@ -1,10 +1,9 @@
-import { useContext } from "react";
 import { useState } from "react";
-import { UserContext, useUserContext } from "../contesti/useContext";
+import { useUserContext } from "../contesti/useContext";
 import { Link, useNavigate } from "react-router-dom";
 
 export function Login() {
-  const { setUserIdLogged } = useUserContext();
+  const { fetchUserLogged } = useUserContext();
 
   const [data, setData] = useState({
     email: "",
@@ -34,7 +33,10 @@ export function Login() {
       let responseData;
       try {
         responseData = await response.json();
-        setUserIdLogged(responseData.userId);
+
+        const { token } = responseData; // Il backend restituisce il token
+        sessionStorage.setItem("token", token); // Salva il token
+        await fetchUserLogged();
       } catch (error) {
         throw new Error(error.message);
       }

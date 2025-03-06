@@ -1,5 +1,4 @@
-
-import { useContext, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 
@@ -10,7 +9,7 @@ export function Registrazione() {
     email: "",
     password: "",
   });
-const {setUserId}=useUserContext()
+  const { setUserId } = useUserContext();
   const [message, setMessage] = useState("");
 
   const navToCaratteristiche = useNavigate();
@@ -48,7 +47,7 @@ const {setUserId}=useUserContext()
       let responseData;
       try {
         responseData = await response.json();
-        setUserId(responseData.userId)
+        setUserId(responseData.userId);
       } catch (error) {
         throw new Error(error.message);
       }

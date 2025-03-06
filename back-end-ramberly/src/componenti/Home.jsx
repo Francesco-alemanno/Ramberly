@@ -1,7 +1,7 @@
-import { useFetcher, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 import { useSwipeable } from "react-swipeable";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 export function Home() {
   const navTo = useNavigate();
@@ -30,19 +30,14 @@ export function Home() {
   //DA MIGLIORARE IN MODO CHE SELEZIONA SOLO L'EVENTO GIUSTO, SETTANDO CORRETTAMENTE SETPARTECIPATEDEVENTS!
   useEffect(() => {
     events.forEach((evento) => {
-      console.log("user.id", user.id, "user", user);
       const checkId = evento.partecipanti.find((x) => {
         x === user.id;
       });
-
-      console.log(checkId);
 
       if (checkId) {
         evento = { ...evento, partecipa: true };
       }
       evento = { ...evento, partecipa: false };
-
-      console.log(evento, evento.partecipa);
     });
   });
 
@@ -58,8 +53,6 @@ export function Home() {
         evento = { ...evento, partecipa: true };
       }
       evento = { ...evento, partecipa: false };
-
-      console.log(evento, evento.partecipa);
     });
 
     try {
