@@ -161,6 +161,7 @@ export const getAllEvents = async (req, res) => {
 
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;
+  console.log("id", id, "event", event_id);
   try {
     const partecipantiEvento = await db.manyOrNone(
       `SELECT partecipanti FROM eventi WHERE id_evento=$1`,

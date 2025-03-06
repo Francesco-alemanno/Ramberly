@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useFetcher, useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 import { useSwipeable } from "react-swipeable";
 import { useEffect, useRef, useState } from "react";
@@ -27,34 +27,65 @@ export function Home() {
     }
   };
 
-  // funzioni bottone partecipa
+  //DA MIGLIORARE IN MODO CHE SELEZIONA SOLO L'EVENTO GIUSTO, SETTANDO CORRETTAMENTE SETPARTECIPATEDEVENTS!
+  useEffect(() => {
+    events.forEach((evento) => {
+      console.log("user.id", user.id, "user", user);
+      const checkId = evento.partecipanti.find((x) => {
+        x === user.id;
+      });
 
-  // const findUser = parseUsers.findIndex(
-  //   (user) => user.email === parseUser.email
-  // );
+      console.log(checkId);
 
-  async function handlePartecipa(idEvento, IdUser) {
-    const jsonData = JSON.stringify({ id: IdUser, event_id: idEvento });
+      if (checkId) {
+        evento = { ...evento, partecipa: true };
+      }
+      evento = { ...evento, partecipa: false };
+
+      console.log(evento, evento.partecipa);
+    });
+  });
+
+  async function handlePartecipa(idUser, idEvento) {
+    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+
+    events.forEach((evento) => {
+      const checkId = evento.partecipanti.find((x) => {
+        x === user.id;
+      });
+
+      if (checkId) {
+        evento = { ...evento, partecipa: true };
+      }
+      evento = { ...evento, partecipa: false };
+
+      console.log(evento, evento.partecipa);
+    });
+
     try {
       const response = await fetch("http://localhost:5001/events", {
         method: "PUT",
         body: jsonData,
         headers: { "Content-Type": "application/json" },
       });
-      setParticipatedEvents(true);
-    } catch (error) {}
+    } catch (error) {
+      console.error(error);
+    }
   }
-  // function handlePartecipa(evento) {
-  //   if (!parseUsers[findUser].eventi_preferiti) {
-  //     parseUsers[findUser].eventi_preferiti = [];
-  //   }
-  //   parseUsers[findUser].eventi_preferiti.push(evento);
-  //   localStorage.setItem("users", JSON.stringify(parseUsers));
-  //   setParticipatedEvents({
-  //     ...participatedEvents,
-  //     [evento.id]: true, // Aggiungi l'evento come "partecipato"
-  //   });
-  // }
+
+  async function handleDelete(idUser, idEvento) {
+    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+    try {
+      const response = await fetch("http://localhost:5001/events", {
+        method: "DELETE",
+        body: jsonData,
+        headers: { "Content-Type": "application/json" },
+      });
+      setParticipatedEvents(false);
+    } catch (error) {
+      console.error(error);
+    }
+  }
 
   // function handleRemovePartecipa(evento) {
   //   if (parseUsers[findUser].eventi_preferiti) {
@@ -202,16 +233,16 @@ export function Home() {
                     </div>
                   </div>
                 </div>
-                {participatedEvents ? (
+                {!evento.partecipa ? (
                   <button
-                    onClick={() => handlePartecipa(evento.id, user.id)}
+                    onClick={() => handlePartecipa(user.id, evento.id_evento)}
                     style={{ fontSize: "18px", color: "white" }}
                   >
                     Partecipa!
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleRemovePartecipa(evento)}
+                    onClick={() => handleDelete(user.id, evento.id_evento)}
                     style={{
                       fontSize: "18px",
                       backgroundColor: "red",

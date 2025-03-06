@@ -118,6 +118,7 @@ export function UserProvider({ children }) {
         userId,
         userIdLogged,
         setUserIdLogged,
+
         users,
         events,
         user,
