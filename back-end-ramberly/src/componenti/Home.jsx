@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { personeRandom, events, user } = useUserContext();
+  const { events, user } = useUserContext();
   // partecipatedEvents diventa il nuovo array degli eventi relativo all'utente loggato
   const [partecipatedEvents, setPartecipatedEvents] = useState(
     events.map((evento) => ({
@@ -14,6 +14,7 @@ export function Home() {
       partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
     }))
   );
+  const [partecipanteNome, setPartecipanteNome] = useState("");
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -85,6 +86,41 @@ export function Home() {
     }
   }
 
+  // recupero id partecipante evento
+
+  // async function getPartecipanteNome(idPartecipante) {
+  //   try {
+  //     const response = await fetch(
+  //       `http://localhost:5001/users/${idPartecipante}`
+  //     );
+  //     if (response.ok) {
+  //       const data = await response.json();
+  //       return data.nome;
+  //     }
+  //     return null;
+  //   } catch (error) {
+  //     console.error(error);
+  //     return null;
+  //   }
+  // }
+
+  // useEffect(() => {
+  //   const fetchPartecipanti = async () => {
+  //     const updatedEvents = await Promise.all(
+  //       events.map(async (evento) => {
+  //         if (evento.partecipanti.length > 0) {
+  //           const nome = await getPartecipanteNome(evento.partecipanti[0]);
+  //           return { ...evento, partecipanteNome: nome };
+  //         }
+  //         return evento;
+  //       })
+  //     );
+  //     setPartecipatedEvents(updatedEvents);
+  //   };
+
+  //   fetchPartecipanti();
+  // }, [events]);
+
   return (
     <div className="home-container">
       <div className="nav-top-home">
@@ -117,14 +153,10 @@ export function Home() {
               <div className="home">
                 <div className="nav-post">
                   <div className="nav-post-user-info">
-                    <img
-                      id="post-avatar"
-                      src={personeRandom[index]?.img || user.img}
-                      alt="user-icon"
-                    />
+                    <img id="post-avatar" src={evento.img} alt="user-icon" />
                     <div className="post-info-container">
                       <div className="post-user-info">
-                        <h3>{evento.id_creatore}</h3>
+                        <h3>{evento.nome}</h3>
                         <h5 style={{ color: "#f7a441" }}>Amici</h5>
                         <a>
                           <img
@@ -134,9 +166,7 @@ export function Home() {
                           />
                         </a>
                       </div>
-                      <h5>
-                        Livello {personeRandom[index]?.livello || user.livello}
-                      </h5>
+                      <h5>Livello {evento.livello}</h5>
                     </div>
                   </div>
                   <div className="icons-container">
@@ -184,9 +214,11 @@ export function Home() {
                     />
                   </div>
                   <span style={{ fontSize: 12 }}>
-                    {`${evento.partecipanti[0]} e altri ${
-                      evento.partecipanti.length - 1
-                    } stanno partecipando!`}
+                    {evento.partecipanti.length > 0
+                      ? `${evento.partecipanteNome} e altri ${
+                          evento.partecipanti.length - 1
+                        } stanno partecipando!`
+                      : "Nessun partecipante"}
                   </span>
                 </div>
                 <div className="info-percorso">

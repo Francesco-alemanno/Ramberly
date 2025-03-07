@@ -144,9 +144,30 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+export const getUserById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const user = await db.oneOrNone("SELECT nome FROM users WHERE id = $1", [
+      id,
+    ]);
+    if (!user) {
+      return res.status(404).json({ message: "Utente non trovato" });
+    }
+    return res.status(200).json({ nome: user.nome });
+  } catch (error) {
+    console.error(error);
+    return res
+      .status(500)
+      .json({ message: "Errore nel recupero dei dati", error });
+  }
+};
+
 export const getAllEvents = async (req, res) => {
   try {
-    const events = await db.many(`SELECT * FROM eventi`);
+    const events =
+      await db.many(`SELECT eventi.*, users.nome, users.img, users.livello 
+      FROM eventi 
+      JOIN users ON eventi.id_creatore = users.id`);
     return res.status(200).json(events);
   } catch (error) {
     return res.status(500).json({ message: "errore nella richiesta", error });
@@ -160,7 +181,17 @@ export const updateEventUser = async (req, res) => {
       `UPDATE eventi SET partecipanti = CASE WHEN NOT ($1 = ANY(partecipanti)) THEN array_append(partecipanti, $1) ELSE partecipanti END WHERE id_evento = $2`,
       [id, event_id]
     );
-    return res.status(200).json({ message: `utente aggiunto correttamente o già esistente` });
+    const updatedEvent = await db.one(
+      `SELECT eventi.*, users.nome, users.img, users.livello 
+       FROM eventi 
+       JOIN users ON eventi.id_creatore = users.id
+       WHERE eventi.id_evento = $1`,
+      [event_id]
+    );
+    return res.status(200).json({
+      message: `utente aggiunto correttamente o già esistente`,
+      updatedEvent,
+    });
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
   }
@@ -173,8 +204,16 @@ export const deleteEventUser = async (req, res) => {
       `UPDATE eventi  SET partecipanti=array_remove(partecipanti, $1)  WHERE id_evento=$2`,
       [id, event_id]
     );
-
-    return res.status(200).json({ message: `eliminato con successo` });
+    const updatedEvent = await db.one(
+      `SELECT eventi.*, users.nome, users.img, users.livello 
+       FROM eventi 
+       JOIN users ON eventi.id_creatore = users.id
+       WHERE eventi.id_evento = $1`,
+      [event_id]
+    );
+    return res
+      .status(200)
+      .json({ message: `eliminato con successo`, updatedEvent });
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
   }

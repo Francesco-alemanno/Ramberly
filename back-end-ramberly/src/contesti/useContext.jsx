@@ -1,7 +1,6 @@
 import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
-import persone from "../database";
 
 export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
@@ -13,12 +12,6 @@ export function UserProvider({ children }) {
   const [events, setEvents] = useState([]);
 
   const [user, setUser] = useState({});
-
-  const [pers, setPers] = useState(persone);
-  const [personeRandom, setPersoneRandom] = useState(() => {
-    const data = localStorage.getItem("personeRandom");
-    return data ? JSON.parse(data) : [];
-  });
 
   // fetch login utente
   const fetchUserLogged = async () => {
@@ -88,8 +81,6 @@ export function UserProvider({ children }) {
   return (
     <UserContext.Provider
       value={{
-        pers,
-        personeRandom,
         setUserId,
         userId,
         users,

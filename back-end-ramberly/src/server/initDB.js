@@ -83,7 +83,7 @@ const setupDb = async () => {
     // ),
     // (
     //   2,
-    //   1,
+    //   2,
     //   'corsetta pomeridiana',
     //   'Via del Corso, Roma',
     //   'Via dei Condotti, Roma',
@@ -97,7 +97,7 @@ const setupDb = async () => {
     // ),
     // (
     //   3,
-    //   1,
+    //   3,
     //   'passeggiata notturna',
     //   'Via Roma, Torino',
     //   'Via Trinchese, Torino',
