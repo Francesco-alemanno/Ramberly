@@ -4,11 +4,11 @@ import dotenv from "dotenv";
 dotenv.config();
 const URL = process.env.URL;
 
-// export const db = pgPromise()(URL);
+export const db = pgPromise()(URL);
 
-export const db = pgPromise()(
-  "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
-);
+// export const db = pgPromise()(
+//   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
+// );
 
 const setupDb = async () => {
   try {

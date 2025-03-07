@@ -14,7 +14,7 @@ import {
   deleteEventUser,
   logout,
 } from "./controllers/controllers.js";
-import passport  from "passport";
+import passport from "passport";
 import "./passport.js";
 import { authorize } from "./authorize.js";
 
@@ -35,8 +35,9 @@ app.put("/scegliSport/:userId", sportPreferito);
 app.put("/scegliAvatar/:userId", scegliAvatar);
 // ------------
 
-// flusso login
+// flusso login/logout
 app.post("/login", login);
+app.get("/logout", authorize, logout);
 
 //flusso home
 app.get(
@@ -48,9 +49,6 @@ app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
 app.delete("/events", deleteEventUser);
-
-// logout
-app.get('/logout',authorize, logout)
 
 // LISTEN
 app.listen(PORT, () => {

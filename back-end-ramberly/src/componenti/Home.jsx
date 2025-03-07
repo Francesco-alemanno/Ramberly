@@ -7,7 +7,14 @@ export function Home() {
   const navTo = useNavigate();
 
   const { personeRandom, events, user } = useUserContext();
-const [partecipatedEvents, setPartecipatedEvents]=useState([])
+  // partecipatedEvents diventa il nuovo array degli eventi relativo all'utente loggato
+  const [partecipatedEvents, setPartecipatedEvents] = useState(
+    events.map((evento) => ({
+      ...evento,
+      partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
+    }))
+  );
+
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlers = useSwipeable({
@@ -28,25 +35,13 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
   //INIZIALIZZAZIONE CHIAVE PARTECIPA AD OGNI RENDER DEL COMPONENTE
 
   useEffect(() => {
-    events.forEach((evento) => {
-      const checkId = evento.partecipanti.find((x) => {
-        
-        return x === user.id;
-      });
-      
+    const updatedEvents = events.map((evento) => ({
+      ...evento,
+      partecipa: evento.partecipanti.includes(user.id),
+    }));
+    setPartecipatedEvents(updatedEvents);
+  }, [events]);
 
-      if (checkId) {
-        evento = { ...evento, partecipa: true };
-       
-      } else {
-        evento = { ...evento, partecipa: false };
-        
-      }
-     setPartecipatedEvents(evento)
-    });
-    console.log(partecipatedEvents)
-  },[]);
-  
   async function handlePartecipa(idUser, idEvento) {
     const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
 
@@ -56,23 +51,19 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
         body: jsonData,
         headers: { "Content-Type": "application/json" },
       });
-      events.forEach((evento) => {
-        const checkId = evento.partecipanti.find((x) => {
-          return x === user.id;
-        });
-
-        if (checkId) {
-          evento = { ...evento, partecipa: true };
-        } else {
-          evento = { ...evento, partecipa: false };
-        }
-      });
+      if (response.ok) {
+        setPartecipatedEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id_evento === idEvento ? { ...event, partecipa: true } : event
+          )
+        );
+      }
     } catch (error) {
       console.error(error);
     }
   }
 
-  async function handleDelete(idUser, idEvento) {
+  async function handleDeletePartecipa(idUser, idEvento) {
     const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
     try {
       const response = await fetch("http://localhost:5001/events", {
@@ -80,16 +71,15 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
         body: jsonData,
         headers: { "Content-Type": "application/json" },
       });
-      events.forEach((evento) => {
-        let selectEvent = {};
-        if (evento.partecipanti.find((x) => x === user.id) === user.id) {
-          selectEvent = { ...evento, partecipa: false };
-        }
-
-        // const checkId = evento.partecipanti.filter((x) => {
-        //   return x === user.id;
-        // });
-      });
+      if (response.ok) {
+        setPartecipatedEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id_evento === idEvento
+              ? { ...event, partecipa: false }
+              : event
+          )
+        );
+      }
     } catch (error) {
       console.error(error);
     }
@@ -122,7 +112,7 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
             transition: "transform 0.3s ease-out",
           }}
         >
-          {events.map((evento, index) => (
+          {partecipatedEvents.map((evento, index) => (
             <div key={index} className="home-slide">
               <div className="home">
                 <div className="nav-post">
@@ -134,7 +124,7 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
                     />
                     <div className="post-info-container">
                       <div className="post-user-info">
-                        <h3>{personeRandom[index]?.nome || user.nome}</h3>
+                        <h3>{evento.id_creatore}</h3>
                         <h5 style={{ color: "#f7a441" }}>Amici</h5>
                         <a>
                           <img
@@ -225,7 +215,7 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
                     </div>
                   </div>
                 </div>
-                {evento.partecipa === true ? (
+                {!evento.partecipa ? (
                   <button
                     onClick={() => handlePartecipa(user.id, evento.id_evento)}
                     style={{ fontSize: "18px", color: "white" }}
@@ -234,7 +224,9 @@ const [partecipatedEvents, setPartecipatedEvents]=useState([])
                   </button>
                 ) : (
                   <button
-                    onClick={() => handleDelete(user.id, evento.id_evento)}
+                    onClick={() =>
+                      handleDeletePartecipa(user.id, evento.id_evento)
+                    }
                     style={{
                       fontSize: "18px",
                       backgroundColor: "red",
