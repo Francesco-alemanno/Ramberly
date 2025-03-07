@@ -181,25 +181,24 @@ export const updateEventUser = async (req, res) => {
 export const deleteEventUser = async (req, res) => {
   const { id, event_id } = req.body;
   try {
-    const partecipantiEvento = await db.manyOrNone(
-      `SELECT partecipanti FROM eventi WHERE id_evento=$1`,
-      [event_id]
+    await db.none(
+      `UPDATE eventi  SET partecipanti=array_remove(partecipanti, $1)  WHERE id_evento=$2`,
+      [id, event_id]
     );
-    const exist = partecipantiEvento[0].partecipanti.some((x) => x === id);
-    if (exist) {
-      const index = partecipantiEvento[0].partecipanti.findIndex(
-        (x) => x === id
-      );
-      partecipantiEvento[0].partecipanti.splice(index, 1);
 
-      await db.none(`UPDATE eventi  SET partecipanti=$1  WHERE id_evento=$2`, [
-        partecipantiEvento[0].partecipanti,
-        event_id,
-      ]);
-      return res.status(200).json({ message: `eliminato con successo` });
-    }
-    return res.status(400).json({ message: `L'utente non partecipa!` });
+    return res.status(200).json({ message: `eliminato con successo` });
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
+  }
+};
+
+export const logout = async (req, res) => {
+  const user = req.user;
+  try {
+    await db.none(`UPDATE users SET token=$2 WHERE id=$1`, [user?.id, null]);
+    res.status(200).json({ message: "logout successfull" });
+  } catch (error) {
+    console.error("logout error:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };

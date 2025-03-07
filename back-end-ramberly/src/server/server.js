@@ -12,9 +12,11 @@ import {
   sportPreferito,
   updateEventUser,
   deleteEventUser,
+  logout,
 } from "./controllers/controllers.js";
-import passport from "passport";
+import passport  from "passport";
 import "./passport.js";
+import { authorize } from "./authorize.js";
 
 dotenv.config();
 
@@ -46,6 +48,9 @@ app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
 app.delete("/events", deleteEventUser);
+
+// logout
+app.get('/logout',authorize, logout)
 
 // LISTEN
 app.listen(PORT, () => {

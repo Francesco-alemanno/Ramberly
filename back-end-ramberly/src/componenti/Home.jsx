@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { personeRandom, users, events, user } = useUserContext();
+  const { personeRandom,  events, user } = useUserContext();
 
   const [participatedEvents, setParticipatedEvents] = useState(false);
 
