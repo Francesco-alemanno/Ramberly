@@ -6,10 +6,8 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { personeRandom,  events, user } = useUserContext();
-
-  const [participatedEvents, setParticipatedEvents] = useState(false);
-
+  const { personeRandom, events, user } = useUserContext();
+const [partecipatedEvents, setPartecipatedEvents]=useState([])
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlers = useSwipeable({
@@ -27,39 +25,47 @@ export function Home() {
     }
   };
 
-  //DA MIGLIORARE IN MODO CHE SELEZIONA SOLO L'EVENTO GIUSTO, SETTANDO CORRETTAMENTE SETPARTECIPATEDEVENTS!
+  //INIZIALIZZAZIONE CHIAVE PARTECIPA AD OGNI RENDER DEL COMPONENTE
+
   useEffect(() => {
     events.forEach((evento) => {
       const checkId = evento.partecipanti.find((x) => {
-        x === user.id;
+        
+        return x === user.id;
       });
+      
 
       if (checkId) {
         evento = { ...evento, partecipa: true };
+       
+      } else {
+        evento = { ...evento, partecipa: false };
+        
       }
-      evento = { ...evento, partecipa: false };
+     setPartecipatedEvents(evento)
     });
-  });
-
+    console.log(partecipatedEvents)
+  },[]);
+  
   async function handlePartecipa(idUser, idEvento) {
     const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
-
-    events.forEach((evento) => {
-      const checkId = evento.partecipanti.find((x) => {
-        x === user.id;
-      });
-
-      if (checkId) {
-        evento = { ...evento, partecipa: true };
-      }
-      evento = { ...evento, partecipa: false };
-    });
 
     try {
       const response = await fetch("http://localhost:5001/events", {
         method: "PUT",
         body: jsonData,
         headers: { "Content-Type": "application/json" },
+      });
+      events.forEach((evento) => {
+        const checkId = evento.partecipanti.find((x) => {
+          return x === user.id;
+        });
+
+        if (checkId) {
+          evento = { ...evento, partecipa: true };
+        } else {
+          evento = { ...evento, partecipa: false };
+        }
       });
     } catch (error) {
       console.error(error);
@@ -74,27 +80,20 @@ export function Home() {
         body: jsonData,
         headers: { "Content-Type": "application/json" },
       });
-      setParticipatedEvents(false);
+      events.forEach((evento) => {
+        let selectEvent = {};
+        if (evento.partecipanti.find((x) => x === user.id) === user.id) {
+          selectEvent = { ...evento, partecipa: false };
+        }
+
+        // const checkId = evento.partecipanti.filter((x) => {
+        //   return x === user.id;
+        // });
+      });
     } catch (error) {
       console.error(error);
     }
   }
-
-  // function handleRemovePartecipa(evento) {
-  //   if (parseUsers[findUser].eventi_preferiti) {
-  //     const currentEvent = parseUsers[findUser].eventi_preferiti.findIndex(
-  //       (index) => index.id === evento.id
-  //     );
-  //     if (currentEvent !== -1) {
-  //       parseUsers[findUser].eventi_preferiti.splice(currentEvent, 1);
-  //       localStorage.setItem("users", JSON.stringify(parseUsers));
-  //     }
-  //   }
-  //   setParticipatedEvents({
-  //     ...participatedEvents,
-  //     [evento.id]: false, // Rimuovi l'evento come "partecipato"
-  //   });
-  // }
 
   return (
     <div className="home-container">
@@ -226,7 +225,7 @@ export function Home() {
                     </div>
                   </div>
                 </div>
-                {!evento.partecipa ? (
+                {evento.partecipa === true ? (
                   <button
                     onClick={() => handlePartecipa(user.id, evento.id_evento)}
                     style={{ fontSize: "18px", color: "white" }}

@@ -155,24 +155,12 @@ export const getAllEvents = async (req, res) => {
 
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;
-  console.log("id", id, "event", event_id);
   try {
-    const partecipantiEvento = await db.manyOrNone(
-      `SELECT partecipanti FROM eventi WHERE id_evento=$1`,
-      [event_id]
+    await db.none(
+      `UPDATE eventi SET partecipanti = CASE WHEN NOT ($1 = ANY(partecipanti)) THEN array_append(partecipanti, $1) ELSE partecipanti END WHERE id_evento = $2`,
+      [id, event_id]
     );
-    const exist = partecipantiEvento[0].partecipanti.some((x) => x === id);
-    if (exist) {
-      return res.status(409).json({ message: `Utente gia partecipa` });
-    }
-    console.log(partecipantiEvento[0].partecipanti);
-
-    partecipantiEvento[0].partecipanti.push(id);
-    await db.none(`UPDATE eventi  SET partecipanti=$1  WHERE id_evento=$2`, [
-      partecipantiEvento[0].partecipanti,
-      event_id,
-    ]);
-    return res.status(200).json({ message: `utente aggiunto correttamente` });
+    return res.status(200).json({ message: `utente aggiunto correttamente o già esistente` });
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
   }
