@@ -4,8 +4,9 @@ import dotenv from "dotenv";
 import {
   aggiornaCaratteristiche,
   getAllEvents,
+  getEventParticipants,
   getAllUsers,
-  getUserById,
+  // getUserById,
   getLoggedUser,
   login,
   registrazione,
@@ -50,7 +51,8 @@ app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
 app.delete("/events", deleteEventUser);
-app.get("/users/:id", getUserById);
+app.get("/events/:id_evento", getEventParticipants);
+// app.get("/users/:id", getUserById);
 
 // LISTEN
 app.listen(PORT, () => {

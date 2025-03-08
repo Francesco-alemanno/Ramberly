@@ -6,15 +6,15 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { events, user } = useUserContext();
-  // partecipatedEvents diventa il nuovo array degli eventi relativo all'utente loggato
-  const [partecipatedEvents, setPartecipatedEvents] = useState(
+  const { events, user, fetchEventParticipants } = useUserContext();
+  // participatedEvents diventa il nuovo array degli eventi relativo all'utente loggato
+  const [participatedEvents, setParticipatedEvents] = useState(
     events.map((evento) => ({
       ...evento,
       partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
     }))
   );
-  const [partecipanteNome, setPartecipanteNome] = useState("");
+  const [eventParticipants, setEventParticipants] = useState({});
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -40,7 +40,7 @@ export function Home() {
       ...evento,
       partecipa: evento.partecipanti.includes(user.id),
     }));
-    setPartecipatedEvents(updatedEvents);
+    setParticipatedEvents(updatedEvents);
   }, [events]);
 
   async function handlePartecipa(idUser, idEvento) {
@@ -53,7 +53,7 @@ export function Home() {
         headers: { "Content-Type": "application/json" },
       });
       if (response.ok) {
-        setPartecipatedEvents((prevEvents) =>
+        setParticipatedEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id_evento === idEvento ? { ...event, partecipa: true } : event
           )
@@ -73,7 +73,7 @@ export function Home() {
         headers: { "Content-Type": "application/json" },
       });
       if (response.ok) {
-        setPartecipatedEvents((prevEvents) =>
+        setParticipatedEvents((prevEvents) =>
           prevEvents.map((event) =>
             event.id_evento === idEvento
               ? { ...event, partecipa: false }
@@ -86,40 +86,19 @@ export function Home() {
     }
   }
 
-  // recupero id partecipante evento
+  // ad ogni cambiamento degli eventi relativo all'utente loggato, viene creato un oggetto che contiene come chiavi gli id degli eventi e come valori un array con i nomi dei partecipanti
+  useEffect(() => {
+    async function loadPartecipanti() {
+      const partecipantiMap = {};
 
-  // async function getPartecipanteNome(idPartecipante) {
-  //   try {
-  //     const response = await fetch(
-  //       `http://localhost:5001/users/${idPartecipante}`
-  //     );
-  //     if (response.ok) {
-  //       const data = await response.json();
-  //       return data.nome;
-  //     }
-  //     return null;
-  //   } catch (error) {
-  //     console.error(error);
-  //     return null;
-  //   }
-  // }
-
-  // useEffect(() => {
-  //   const fetchPartecipanti = async () => {
-  //     const updatedEvents = await Promise.all(
-  //       events.map(async (evento) => {
-  //         if (evento.partecipanti.length > 0) {
-  //           const nome = await getPartecipanteNome(evento.partecipanti[0]);
-  //           return { ...evento, partecipanteNome: nome };
-  //         }
-  //         return evento;
-  //       })
-  //     );
-  //     setPartecipatedEvents(updatedEvents);
-  //   };
-
-  //   fetchPartecipanti();
-  // }, [events]);
+      for (const evento of participatedEvents) {
+        const nomi = await fetchEventParticipants(evento.id_evento);
+        partecipantiMap[evento.id_evento] = nomi;
+      }
+      setEventParticipants(partecipantiMap);
+    }
+    loadPartecipanti();
+  }, [participatedEvents]);
 
   return (
     <div className="home-container">
@@ -148,7 +127,7 @@ export function Home() {
             transition: "transform 0.3s ease-out",
           }}
         >
-          {partecipatedEvents.map((evento, index) => (
+          {participatedEvents.map((evento, index) => (
             <div key={index} className="home-slide">
               <div className="home">
                 <div className="nav-post">
@@ -214,9 +193,9 @@ export function Home() {
                     />
                   </div>
                   <span style={{ fontSize: 12 }}>
-                    {evento.partecipanti.length > 0
-                      ? `${evento.partecipanteNome} e altri ${
-                          evento.partecipanti.length - 1
+                    {eventParticipants[evento.id_evento]?.length > 0
+                      ? `${eventParticipants[evento.id_evento][0]} e altri ${
+                          eventParticipants[evento.id_evento].length - 1
                         } stanno partecipando!`
                       : "Nessun partecipante"}
                   </span>

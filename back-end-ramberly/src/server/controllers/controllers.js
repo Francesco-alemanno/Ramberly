@@ -144,23 +144,23 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
-export const getUserById = async (req, res) => {
-  const { id } = req.params;
-  try {
-    const user = await db.oneOrNone("SELECT nome FROM users WHERE id = $1", [
-      id,
-    ]);
-    if (!user) {
-      return res.status(404).json({ message: "Utente non trovato" });
-    }
-    return res.status(200).json({ nome: user.nome });
-  } catch (error) {
-    console.error(error);
-    return res
-      .status(500)
-      .json({ message: "Errore nel recupero dei dati", error });
-  }
-};
+// export const getUserById = async (req, res) => {
+//   const { id } = req.params;
+//   try {
+//     const user = await db.oneOrNone("SELECT nome FROM users WHERE id = $1", [
+//       id,
+//     ]);
+//     if (!user) {
+//       return res.status(404).json({ message: "Utente non trovato" });
+//     }
+//     return res.status(200).json({ nome: user.nome });
+//   } catch (error) {
+//     console.error(error);
+//     return res
+//       .status(500)
+//       .json({ message: "Errore nel recupero dei dati", error });
+//   }
+// };
 
 export const getAllEvents = async (req, res) => {
   try {
@@ -214,6 +214,23 @@ export const deleteEventUser = async (req, res) => {
     return res
       .status(200)
       .json({ message: `eliminato con successo`, updatedEvent });
+  } catch (error) {
+    return res.status(500).json({ message: `errore nella richiesta`, error });
+  }
+};
+
+export const getEventParticipants = async (req, res) => {
+  const { id_evento } = req.params;
+  try {
+    const partecipanti = await db.any(
+      `SELECT users.nome
+       FROM eventi
+       JOIN LATERAL unnest(eventi.partecipanti) AS partecipante_id ON true
+       JOIN users ON users.id = partecipante_id
+       WHERE eventi.id_evento = $1;`,
+      [id_evento]
+    );
+    return res.json(partecipanti);
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
   }

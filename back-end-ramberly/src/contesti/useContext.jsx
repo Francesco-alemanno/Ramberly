@@ -9,9 +9,8 @@ export function UserProvider({ children }) {
   const [userId, setUserId] = useState(null); // aggiornamento stato id
 
   const [users, setUsers] = useState([]);
-  const [events, setEvents] = useState([]);
-
   const [user, setUser] = useState({});
+  const [events, setEvents] = useState([]);
 
   // fetch login utente
   const fetchUserLogged = async () => {
@@ -78,6 +77,20 @@ export function UserProvider({ children }) {
     fetchAllEvents();
   }, []);
 
+  // fetch nomi utenti partecipanti per evento
+  const fetchEventParticipants = async (idEvento) => {
+    try {
+      const response = await fetch(`http://localhost:5001/events/${idEvento}`);
+      if (!response.ok) {
+        throw new Error("Errore nel recupero partecipanti");
+      }
+      const data = await response.json();
+      return data.map((partecipante) => partecipante.nome);
+    } catch (error) {
+      console.error({ message: "errore nel fetching", error });
+    }
+  };
+
   return (
     <UserContext.Provider
       value={{
@@ -87,6 +100,7 @@ export function UserProvider({ children }) {
         events,
         user,
         fetchUserLogged,
+        fetchEventParticipants,
       }}
     >
       {children}
