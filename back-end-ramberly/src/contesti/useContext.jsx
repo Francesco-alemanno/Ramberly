@@ -11,7 +11,21 @@ export function UserProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
+  const [participatedEvents, setParticipatedEvents] = useState(
+    events.map((evento) => ({
+      ...evento,
+      partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
+    }))
+  );
+  useEffect(() => {
+    const updatedEvents = events.map((evento) => ({
+      ...evento,
+      partecipa: evento.partecipanti.includes(user.id),
+    }));
+    setParticipatedEvents(updatedEvents);
+  }, [events]);
 
+  
   // fetch login utente
   const fetchUserLogged = async () => {
     const token = sessionStorage.getItem("token");
@@ -90,6 +104,49 @@ export function UserProvider({ children }) {
       console.error({ message: "errore nel fetching", error });
     }
   };
+// funzioni di aggiunta e rimozione eventi preferiti
+async function handlePartecipa(idUser, idEvento) {
+  const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+
+  try {
+    const response = await fetch("http://localhost:5001/events", {
+      method: "PUT",
+      body: jsonData,
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      setParticipatedEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id_evento === idEvento ? { ...event, partecipa: true } : event
+        )
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+ async function handleDeletePartecipa(idUser, idEvento) {
+  const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+  try {
+    const response = await fetch("http://localhost:5001/events", {
+      method: "DELETE",
+      body: jsonData,
+      headers: { "Content-Type": "application/json" },
+    });
+    if (response.ok) {
+      setParticipatedEvents((prevEvents) =>
+        prevEvents.map((event) =>
+          event.id_evento === idEvento
+            ? { ...event, partecipa: false }
+            : event
+        )
+      );
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}
 
   return (
     <UserContext.Provider
@@ -101,6 +158,9 @@ export function UserProvider({ children }) {
         user,
         fetchUserLogged,
         fetchEventParticipants,
+        handleDeletePartecipa,
+        handlePartecipa,
+        participatedEvents
       }}
     >
       {children}

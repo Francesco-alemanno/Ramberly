@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const { events, user, fetchEventParticipants } = useUserContext();
-  // participatedEvents diventa il nuovo array degli eventi relativo all'utente loggato
-  const [participatedEvents, setParticipatedEvents] = useState(
-    events.map((evento) => ({
-      ...evento,
-      partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
-    }))
-  );
+  const {
+    user,
+    fetchEventParticipants,
+    participatedEvents,
+    handleDeletePartecipa,
+    handlePartecipa,
+  } = useUserContext();
+
   const [eventParticipants, setEventParticipants] = useState({});
 
   // logica carosello
@@ -25,66 +25,13 @@ export function Home() {
   });
 
   const handleSwipe = (direction) => {
-    if (direction === "left" && currentIndex < events.length - 1) {
+    if (direction === "left" && currentIndex < participatedEvents.length - 1) {
       setCurrentIndex((prev) => prev + 1);
     }
     if (direction === "right" && currentIndex > 0) {
       setCurrentIndex((prev) => prev - 1);
     }
   };
-
-  //INIZIALIZZAZIONE CHIAVE PARTECIPA AD OGNI RENDER DEL COMPONENTE
-
-  useEffect(() => {
-    const updatedEvents = events.map((evento) => ({
-      ...evento,
-      partecipa: evento.partecipanti.includes(user.id),
-    }));
-    setParticipatedEvents(updatedEvents);
-  }, [events]);
-
-  async function handlePartecipa(idUser, idEvento) {
-    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
-
-    try {
-      const response = await fetch("http://localhost:5001/events", {
-        method: "PUT",
-        body: jsonData,
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.ok) {
-        setParticipatedEvents((prevEvents) =>
-          prevEvents.map((event) =>
-            event.id_evento === idEvento ? { ...event, partecipa: true } : event
-          )
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  async function handleDeletePartecipa(idUser, idEvento) {
-    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
-    try {
-      const response = await fetch("http://localhost:5001/events", {
-        method: "DELETE",
-        body: jsonData,
-        headers: { "Content-Type": "application/json" },
-      });
-      if (response.ok) {
-        setParticipatedEvents((prevEvents) =>
-          prevEvents.map((event) =>
-            event.id_evento === idEvento
-              ? { ...event, partecipa: false }
-              : event
-          )
-        );
-      }
-    } catch (error) {
-      console.error(error);
-    }
-  }
 
   // ad ogni cambiamento degli eventi relativo all'utente loggato, viene creato un oggetto che contiene come chiavi gli id degli eventi e come valori un array con i nomi dei partecipanti
   useEffect(() => {
@@ -253,7 +200,7 @@ export function Home() {
         </div>
       </div>
       <div className="carousel-dots">
-        {events.map((_, index) => (
+        {participatedEvents.map((_, index) => (
           <span
             key={index}
             className={`dot ${index === currentIndex ? "active" : ""}`}

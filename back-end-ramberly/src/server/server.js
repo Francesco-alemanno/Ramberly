@@ -15,6 +15,7 @@ import {
   updateEventUser,
   deleteEventUser,
   logout,
+  getEventiPreferiti,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
@@ -54,6 +55,8 @@ app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
 // app.get("/users/:id", getUserById);
 
+// Eventi preferiti
+app.get('/eventiPreferiti/:userId',getEventiPreferiti )
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);

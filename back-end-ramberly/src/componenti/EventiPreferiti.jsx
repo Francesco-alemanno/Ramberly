@@ -1,31 +1,10 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
 import { useUserContext } from "../contesti/useContext";
 
 export function EventiPreferiti() {
-  const { personeRandom } = useUserContext();
+  const { user, participatedEvents, handleDeletePartecipa } = useUserContext();
 
-  // metodo per trovare eventi preferiti
-  const parseUsers = JSON.parse(localStorage.getItem("users"));
-  const findUser = parseUsers.find((user) => user.eventi_preferiti);
-  console.log(findUser);
   const navTo = useNavigate();
-  // ----------------------------------
-
-  const [eventiPreferiti, setEventiPreferiti] = useState(
-    findUser ? findUser.eventi_preferiti : []
-  );
-
-  function handleRemoveEvento(eventoId) {
-    const updatedEventi = eventiPreferiti.filter(
-      (evento) => evento.id !== eventoId
-    );
-
-    setEventiPreferiti(updatedEventi);
-
-    findUser.eventi_preferiti = updatedEventi;
-    localStorage.setItem("users", JSON.stringify(parseUsers));
-  }
 
   return (
     <>
@@ -50,83 +29,83 @@ export function EventiPreferiti() {
         </div>
       </div>
 
-      {eventiPreferiti.length > 0 ? (
-        eventiPreferiti.map((evento, index) => (
-          <div className="eventi-preferiti" key={evento.id}>
-            <div className="utente-titolo">
-              <img
-                id="post-avatar"
-                src={personeRandom[index].img}
-                alt="user-icon"
-              />
-              <div className="post-info-container">
-                <div className="post-user-info">
-                  <h3>{personeRandom[index].nome}</h3>
-                  <h5>Amici</h5>
-                  <a>
-                    <img
-                      id="post-settings-icon"
-                      src="\friends-svgrepo-com.svg"
-                      alt="post settings"
-                    />
-                  </a>
+      {participatedEvents.filter((evento) => evento.partecipa).length > 0 ? (
+        participatedEvents
+          .filter((evento) => evento.partecipa)
+          .map((evento, index) => (
+            <div className="eventi-preferiti" key={index}>
+              <div className="utente-titolo">
+                <img id="post-avatar" src={evento.img} alt="user-icon" />
+                <div className="post-info-container">
+                  <div className="post-user-info">
+                    <h3>{evento.nome}</h3>
+                    <h5>Amici</h5>
+                    <a>
+                      <img
+                        id="post-settings-icon"
+                        src="\friends-svgrepo-com.svg"
+                        alt="post settings"
+                      />
+                    </a>
+                  </div>
+                  <h5>Livello {evento.livello}</h5>
                 </div>
-                <h5>Livello {personeRandom[index].livello}</h5>
+                <p>{evento.nome_evento}</p>
               </div>
-              <p>{evento.nome_evento}</p>
-            </div>
-            <div>
-              <p>{evento.start}</p>
-              <p>{evento.finish}</p>
-            </div>
+              <div>
+                <p>{evento.start}</p>
+                <p>{evento.finish}</p>
+              </div>
 
-            <div className="info-evento-preferiti">
-              <div className="map-preferiti">
-                <img
-                  src={evento.img}
-                  width={150}
-                  alt="Mappa"
-                  className="mappa"
-                />
+              <div className="info-evento-preferiti">
+                <div className="map-preferiti">
+                  <img
+                    src={evento.map_img}
+                    width={150}
+                    alt="Mappa"
+                    className="mappa"
+                  />
+                </div>
+                <div className="box-dati-preferiti">
+                  <div className="km-preferiti">
+                    <img
+                      src="src\assets\icons\kilometers.svg"
+                      alt="distanza"
+                      width={25}
+                    />
+                    <p>{evento.distanza}</p>
+                  </div>
+                  <div className="orario-preferiti">
+                    <img
+                      src="src\assets\icons\clock.svg"
+                      alt="orario"
+                      width={25}
+                    />
+                    <p>{evento.orario.slice(0, -3)}</p>
+                  </div>
+                  <div className="data-preferiti">
+                    <img
+                      src="src\assets\icons\calendar.svg"
+                      alt="data"
+                      width={25}
+                    />
+                    <p>{new Date(evento.data).toLocaleDateString()}</p>
+                  </div>
+                </div>
               </div>
-              <div className="box-dati-preferiti">
-                <div className="km-preferiti">
-                  <img
-                    src="src\assets\icons\kilometers.svg"
-                    alt="distanza"
-                    width={25}
-                  />
-                  <p>{evento.distanza}</p>
-                </div>
-                <div className="orario-preferiti">
-                  <img
-                    src="src\assets\icons\clock.svg"
-                    alt="orario"
-                    width={25}
-                  />
-                  <p>{evento.orario}</p>
-                </div>
-                <div className="data-preferiti">
-                  <img
-                    src="src\assets\icons\calendar.svg"
-                    alt="data"
-                    width={25}
-                  />
-                  <p>{evento.data}</p>
-                </div>
+              <div className="btn-eventi-preferiti">
+                <button className="btn-facile">Facile</button>
+                <button
+                  onClick={() =>
+                    handleDeletePartecipa(user.id, evento.id_evento)
+                  }
+                  className="red-btn"
+                >
+                  Rimuovi
+                </button>
               </div>
             </div>
-            <div className="btn-eventi-preferiti">
-              <button className="btn-facile">Facile</button>
-              <button
-                onClick={() => handleRemoveEvento(evento.id)}
-                className="red-btn"
-              >
-                Rimuovi
-              </button>
-            </div>
-          </div>
-        ))
+          ))
       ) : (
         <p>Non ci sono eventi preferiti</p>
       )}

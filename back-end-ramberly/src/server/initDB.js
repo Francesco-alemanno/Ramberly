@@ -4,10 +4,14 @@ import dotenv from "dotenv";
 dotenv.config();
 const URL = process.env.URL;
 
-export const db = pgPromise()(URL);
+// export const db = pgPromise()(URL);
+
+export const db = pgPromise()(
+  "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
+);
 
 // export const db = pgPromise()(
-//   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
+//   "postgresql://postgres:Fingerskate1@localhost:5432/ramberly"
 // );
 
 const setupDb = async () => {
@@ -57,7 +61,7 @@ const setupDb = async () => {
         nome_evento TEXT,
         start TEXT,
         finish TEXT,
-        img TEXT,
+        map_img TEXT,
         distanza DECIMAL(10,2),
         orario TIME,
         data DATE,
@@ -66,7 +70,7 @@ const setupDb = async () => {
         difficolta CHAR(1)
       );
     `);
-    //     await db.none(`INSERT INTO eventi (id_evento,id_creatore,nome_evento, start, finish, img, distanza, orario, data,partecipanti, privacy,difficolta) VALUES
+    //     await db.none(`INSERT INTO eventi (id_evento,id_creatore,nome_evento, start, finish, map_img, distanza, orario, data,partecipanti, privacy,difficolta) VALUES
     // (
     //   1,
     //   1,

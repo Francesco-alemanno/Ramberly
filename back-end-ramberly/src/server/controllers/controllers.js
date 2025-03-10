@@ -174,6 +174,26 @@ export const getAllEvents = async (req, res) => {
   }
 };
 
+export const getEventiPreferiti = async (req, res) => {
+  const { userId } = req.params;
+  try {
+    const eventiPreferiti = await db.any(
+      `SELECT eventi.*, users.nome, users.livello, users.img 
+FROM eventi
+JOIN users ON eventi.id_creatore = users.id  
+WHERE $1 = ANY(eventi.partecipanti)`,
+      [userId]
+    );
+    res.status(200).json(eventiPreferiti);
+    return eventiPreferiti;
+  } catch (error) {
+    console.error("Errore nel recupero degli eventi preferiti:", error);
+    res.status(400).json({ message: "non trovato" });
+
+    throw error;
+  }
+};
+
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;
   try {
