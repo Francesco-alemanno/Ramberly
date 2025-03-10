@@ -1,6 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
+import { data } from "react-router-dom";
 
 export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
@@ -16,6 +17,7 @@ export function UserProvider({ children }) {
       partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
     }))
   );
+  const [avatar, setAvatar] = useState(null);
   useEffect(() => {
     const updatedEvents = events.map((evento) => ({
       ...evento,
@@ -52,6 +54,26 @@ export function UserProvider({ children }) {
       fetchUserLogged(); // Se c'è un token, carica i dati dell'utente
     }
   }, []);
+
+    useEffect(() => {
+      async function fetchAvatar(userId) {
+      
+        try {
+          const response = await fetch(`http://localhost:5001/avatar/${userId}`);
+          const data = await response.json();
+        
+          if (data.img) {
+            setAvatar(data.img);
+          }
+        } catch (error) {
+          console.error("Errore nel recupero dell'avatar:", error);
+        }
+      }
+      if (user?.id) {
+        fetchAvatar(user.id);
+      }
+    }, [user])
+  
 
   // fetch users dal database
   const fetchAllUsers = async () => {
@@ -159,6 +181,7 @@ export function UserProvider({ children }) {
         handleDeletePartecipa,
         handlePartecipa,
         participatedEvents,
+        avatar,
       }}
     >
       {children}

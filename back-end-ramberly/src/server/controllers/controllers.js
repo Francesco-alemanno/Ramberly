@@ -98,22 +98,44 @@ export const followUser = async (req, res) => {
 
 export const scegliAvatar = async (req, res) => {
   const { userId } = req.params;
-  const { img } = req.body;
+  const avatarBuffer = req.file.buffer
 
   try {
-    await db.none(
-      `UPDATE users 
-       SET img=$1
-       WHERE id=$2`,
-      [img, userId]
+    await db.oneOrNone(
+      `UPDATE users
+      SET img = $1
+      WHERE id = $2
+      RETURNING id;
+    `,
+      [avatarBuffer, userId]
     );
 
     res.status(200).json({ message: "Avatar aggiornato con successo" });
   } catch (error) {
-    console.error("Errore aggiornamento avatar:", error);
+    console.error("Errore aggiornamento avatar:", error.message);
     res
       .status(500)
       .json({ message: "Errore durante l'aggiornamento dell'avatar." });
+  }
+};
+
+export const getAvatar = async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await db.oneOrNone(
+      `SELECT encode(img, 'base64') AS img FROM users WHERE id = $1;`,
+      [userId]
+    );
+
+    if (!user || !user.img) {
+      return res.status(404).json({ message: "Avatar non trovato" });
+    }
+
+    res.json({ img: `data:image/png;base64,${user.img}` });
+  } catch (error) {
+    console.error("Errore nel recupero dell'avatar:", error.message, error.stack);
+    res.status(500).json({ message: "Errore durante il recupero dell'avatar."  });
   }
 };
 

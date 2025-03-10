@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 
 export function Account() {
-  const { userLogged } = useUserContext();
+  const { user, avatar } = useUserContext();
   const navTo= useNavigate()
   return (
     <>
@@ -32,10 +32,10 @@ export function Account() {
 
       <div >
         
-        <img src={userLogged.img} style={{borderRadius:'50%'}} width={100} alt="avatar" />
+        <img src={avatar} style={{borderRadius:'50%'}} width={100} alt="avatar" />
         <div >
         <h2>
-          {userLogged.nome} {userLogged.cognome}
+          {user.nome} 
         </h2>
         </div>
         

@@ -12,7 +12,9 @@ export function Home() {
     participatedEvents,
     handleDeletePartecipa,
     handlePartecipa,
+    avatar
   } = useUserContext();
+
 
   const [eventParticipants, setEventParticipants] = useState({});
 
@@ -32,7 +34,7 @@ export function Home() {
       setCurrentIndex((prev) => prev - 1);
     }
   };
-
+  
   // ad ogni cambiamento degli eventi relativo all'utente loggato, viene creato un oggetto che contiene come chiavi gli id degli eventi e come valori un array con i nomi dei partecipanti
   useEffect(() => {
     async function loadPartecipanti() {
@@ -60,7 +62,7 @@ export function Home() {
           </div>
           <img
             id="home-user-avatar"
-            src={user.img}
+            src={avatar}
             alt="user-icon"
             onClick={() => navTo("/account")}
           />

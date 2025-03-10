@@ -16,10 +16,15 @@ import {
   deleteEventUser,
   logout,
   getEventiPreferiti,
+  getAvatar,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
 import { authorize } from "./authorize.js";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 dotenv.config();
 
@@ -36,7 +41,8 @@ app.post("/registrazione", registrazione);
 app.put("/caratteristiche/:userId", aggiornaCaratteristiche);
 app.put("/scegliSport/:userId", sportPreferito);
 app.put("/potrestiConoscere/:userId", followUser);
-app.put("/scegliAvatar/:userId", scegliAvatar);
+app.put("/scegliAvatar/:userId", upload.single("img"), scegliAvatar);
+app.get('/avatar/:userId', getAvatar)
 // ------------
 
 // flusso login/logout
