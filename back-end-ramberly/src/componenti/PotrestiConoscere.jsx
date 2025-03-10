@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contesti/useContext";
 
 export function PotrestiConoscere() {
+  const { users, userId } = useUserContext();
   const [seguendo, setSeguendo] = useState([]);
 
   const navTo = useNavigate();
@@ -12,42 +14,41 @@ export function PotrestiConoscere() {
     navTo("/sceglieresport");
   };
 
-  const users = localStorage.getItem("users");
-  const profiles = JSON.parse(users);
-
-  const handleAddProfile = (profile) => {
-    const user = localStorage.getItem("user");
-    const parseUser = JSON.parse(user);
-
-    if (!parseUser.seguiti) {
-      parseUser.seguiti = [];
+  const handleAddProfile = async (profile) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5001/potrestiConoscere/${userId}`,
+        {
+          method: "PUT",
+          body: JSON.stringify({
+            targetUserId: [profile.id],
+          }),
+          headers: { "Content-Type": "application/json" },
+        }
+      );
+      if (response.ok) {
+        setSeguendo([...seguendo, profile]);
+      }
+    } catch (error) {
+      console.error({ message: "errore nel fetching", error });
     }
-
-    // Verifica se l'utente è già nei seguiti
-    const utentiSeguiti = parseUser.seguiti.findIndex(
-      (utente) => utente.email === profile.email
-    );
-
-    if (utentiSeguiti === -1) {
-      parseUser.seguiti.push({
-        nome: profile.nome,
-        email: profile.email,
-      });
-      setSeguendo([...seguendo, { nome: profile.nome, email: profile.email }]);
-    } else {
-      parseUser.seguiti.splice(utentiSeguiti, 1);
-      setSeguendo(seguendo.filter((utente) => utente.email !== profile.email));
-    }
-
-    localStorage.setItem("user", JSON.stringify(parseUser));
-    console.log("Utente aggiornato:", parseUser);
   };
 
   return (
     <div className="main-container">
-     <img src="src/assets/loghi/logo.svg" width={110} style={{marginBottom:'10px'}} alt="logo" />
+      <img
+        src="src/assets/loghi/logo.svg"
+        width={110}
+        style={{ marginBottom: "10px" }}
+        alt="logo"
+      />
 
-      <img src="src/assets/icons/step3.svg" width={310} style={{marginBottom:'10px'}} alt="" />
+      <img
+        src="src/assets/icons/step3.svg"
+        width={310}
+        style={{ marginBottom: "10px" }}
+        alt=""
+      />
 
       <div className="form">
         <div className="title-potresti-consoscere">
@@ -72,14 +73,13 @@ export function PotrestiConoscere() {
           </a>
 
           <h3 className="link-h3-class">Potresti conoscere:</h3>
-
         </div>
         <div className="list-container">
           <ul>
-            {profiles.map((profile) => (
+            {users.map((profile) => (
               <li key={profile.id} className="user-item">
                 <div className="user-avatar">
-                  <img src={profile.img} alt={`Profile ${profile.nome}`} />
+                  <img src={profile.img} alt={`avatar ${profile.nome}`} />
                 </div>
                 <div className="user-info">
                   <span className="user-name"> {profile.nome}</span>

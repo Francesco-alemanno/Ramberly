@@ -6,21 +6,24 @@ import {
   getAllEvents,
   getEventParticipants,
   getAllUsers,
-  // getUserById,
   getLoggedUser,
   login,
   registrazione,
   scegliAvatar,
   sportPreferito,
+  followUser,
   updateEventUser,
   deleteEventUser,
   logout,
   getEventiPreferiti,
-  insertEvents,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
 import { authorize } from "./authorize.js";
+import multer from "multer";
+
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 
 dotenv.config();
 
@@ -36,7 +39,9 @@ app.use(passport.initialize());
 app.post("/registrazione", registrazione);
 app.put("/caratteristiche/:userId", aggiornaCaratteristiche);
 app.put("/scegliSport/:userId", sportPreferito);
-app.put("/scegliAvatar/:userId", scegliAvatar);
+app.put("/potrestiConoscere/:userId", followUser);
+app.put("/scegliAvatar/:userId", upload.single("img"), scegliAvatar);
+app.get('/avatar/:userId', getAvatar)
 // ------------
 
 // flusso login/logout
@@ -44,21 +49,16 @@ app.post("/login", login);
 app.get("/logout", authorize, logout);
 
 //flusso home
-app.get(
-  "/home",
-  passport.authenticate("jwt", { session: false }),
-  getLoggedUser
-);
+app.get("/home", authorize, getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
 app.post("/events", insertEvents);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
-// app.get("/users/:id", getUserById);
 
 // Eventi preferiti
-app.get('/eventiPreferiti/:userId',getEventiPreferiti )
+app.get("/eventiPreferiti/:userId", getEventiPreferiti);
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);
