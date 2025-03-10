@@ -6,12 +6,12 @@ import {
   getAllEvents,
   getEventParticipants,
   getAllUsers,
-  // getUserById,
   getLoggedUser,
   login,
   registrazione,
   scegliAvatar,
   sportPreferito,
+  followUser,
   updateEventUser,
   deleteEventUser,
   logout,
@@ -35,6 +35,7 @@ app.use(passport.initialize());
 app.post("/registrazione", registrazione);
 app.put("/caratteristiche/:userId", aggiornaCaratteristiche);
 app.put("/scegliSport/:userId", sportPreferito);
+app.put("/potrestiConoscere/:userId", followUser);
 app.put("/scegliAvatar/:userId", scegliAvatar);
 // ------------
 
@@ -43,20 +44,15 @@ app.post("/login", login);
 app.get("/logout", authorize, logout);
 
 //flusso home
-app.get(
-  "/home",
-  passport.authenticate("jwt", { session: false }),
-  getLoggedUser
-);
+app.get("/home", authorize, getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
-// app.get("/users/:id", getUserById);
 
 // Eventi preferiti
-app.get('/eventiPreferiti/:userId',getEventiPreferiti )
+app.get("/eventiPreferiti/:userId", getEventiPreferiti);
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);

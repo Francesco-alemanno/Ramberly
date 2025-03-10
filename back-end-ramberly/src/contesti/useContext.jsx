@@ -7,7 +7,6 @@ export const useUserContext = () => useContext(UserContext);
 
 export function UserProvider({ children }) {
   const [userId, setUserId] = useState(null); // aggiornamento stato id
-
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
@@ -25,7 +24,6 @@ export function UserProvider({ children }) {
     setParticipatedEvents(updatedEvents);
   }, [events]);
 
-  
   // fetch login utente
   const fetchUserLogged = async () => {
     const token = sessionStorage.getItem("token");
@@ -104,49 +102,49 @@ export function UserProvider({ children }) {
       console.error({ message: "errore nel fetching", error });
     }
   };
-// funzioni di aggiunta e rimozione eventi preferiti
-async function handlePartecipa(idUser, idEvento) {
-  const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+  // funzioni di aggiunta e rimozione eventi preferiti
+  async function handlePartecipa(idUser, idEvento) {
+    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
 
-  try {
-    const response = await fetch("http://localhost:5001/events", {
-      method: "PUT",
-      body: jsonData,
-      headers: { "Content-Type": "application/json" },
-    });
-    if (response.ok) {
-      setParticipatedEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event.id_evento === idEvento ? { ...event, partecipa: true } : event
-        )
-      );
+    try {
+      const response = await fetch("http://localhost:5001/events", {
+        method: "PUT",
+        body: jsonData,
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.ok) {
+        setParticipatedEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id_evento === idEvento ? { ...event, partecipa: true } : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
-}
 
- async function handleDeletePartecipa(idUser, idEvento) {
-  const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
-  try {
-    const response = await fetch("http://localhost:5001/events", {
-      method: "DELETE",
-      body: jsonData,
-      headers: { "Content-Type": "application/json" },
-    });
-    if (response.ok) {
-      setParticipatedEvents((prevEvents) =>
-        prevEvents.map((event) =>
-          event.id_evento === idEvento
-            ? { ...event, partecipa: false }
-            : event
-        )
-      );
+  async function handleDeletePartecipa(idUser, idEvento) {
+    const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
+    try {
+      const response = await fetch("http://localhost:5001/events", {
+        method: "DELETE",
+        body: jsonData,
+        headers: { "Content-Type": "application/json" },
+      });
+      if (response.ok) {
+        setParticipatedEvents((prevEvents) =>
+          prevEvents.map((event) =>
+            event.id_evento === idEvento
+              ? { ...event, partecipa: false }
+              : event
+          )
+        );
+      }
+    } catch (error) {
+      console.error(error);
     }
-  } catch (error) {
-    console.error(error);
   }
-}
 
   return (
     <UserContext.Provider
@@ -160,7 +158,7 @@ async function handlePartecipa(idUser, idEvento) {
         fetchEventParticipants,
         handleDeletePartecipa,
         handlePartecipa,
-        participatedEvents
+        participatedEvents,
       }}
     >
       {children}

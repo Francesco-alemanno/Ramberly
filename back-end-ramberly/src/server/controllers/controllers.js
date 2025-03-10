@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 dotenv.config();
 const { SECRET = "" } = process.env;
 
+//flusso registrazione
 export const registrazione = async (req, res) => {
   const { nome, cognome, email, password } = req.body;
   const userExist = await db.oneOrNone(`SELECT * FROM users WHERE email=$1`, [
@@ -68,6 +69,27 @@ export const sportPreferito = async (req, res) => {
     res.status(200).json({ message: "Dati aggiornati con successo" });
   } catch (err) {
     console.error(err);
+    res
+      .status(500)
+      .json({ message: "Errore durante l'aggiornamento dei dati" });
+  }
+};
+
+export const followUser = async (req, res) => {
+  const { userId } = req.params;
+  const { targetUserId } = req.body;
+  try {
+    for (const targetId of targetUserId) {
+      await db.none(
+        `UPDATE users 
+         SET seguiti = array_append(seguiti, $2) 
+         WHERE id = $1 AND NOT ($2 = ANY(seguiti))`,
+        [userId, targetId]
+      );
+    }
+    res.status(200).json({ message: "Utenti seguiti aggiornati con successo" });
+  } catch (error) {
+    console.error(error);
     res
       .status(500)
       .json({ message: "Errore durante l'aggiornamento dei dati" });
@@ -143,24 +165,6 @@ export const getAllUsers = async (req, res) => {
     return res.status(500).json({ message: "errore nella richiesta", error });
   }
 };
-
-// export const getUserById = async (req, res) => {
-//   const { id } = req.params;
-//   try {
-//     const user = await db.oneOrNone("SELECT nome FROM users WHERE id = $1", [
-//       id,
-//     ]);
-//     if (!user) {
-//       return res.status(404).json({ message: "Utente non trovato" });
-//     }
-//     return res.status(200).json({ nome: user.nome });
-//   } catch (error) {
-//     console.error(error);
-//     return res
-//       .status(500)
-//       .json({ message: "Errore nel recupero dei dati", error });
-//   }
-// };
 
 export const getAllEvents = async (req, res) => {
   try {
