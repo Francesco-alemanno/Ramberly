@@ -220,6 +220,20 @@ WHERE $1 = ANY(eventi.partecipanti)`,
   }
 };
 
+export const insertEvents = async (req, res) => {
+  try {
+    const { nome_evento, start, finish, map_img, distanza, orario, data} = req.body;
+    const newEvent = await db.none(
+      `INSERT INTO eventi (nome_evento, start, finish, map_img, distanza, orario, data ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+      [nome_evento, start, finish,  map_img, distanza, orario, data]
+    );
+    return res.status(200).json({ message: "Evento aggiunto"});
+  } catch (err) {
+    console.error("Errore nei dati inseriti");
+    res.status(500).json({ message: "Errore nel server"});
+  }
+};
+
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;
   try {
