@@ -98,14 +98,17 @@ export function CreaEvento() {
 
       const newData = { ...data, distanza: distance, img: screenshotUrl };
 
-      const existData = localStorage.getItem("eventi");
-      let utentiRegistrati = existData ? JSON.parse(existData) : [];
+      const response = await fetch("http://localhost:5001/events", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newData),
+      });
 
-      utentiRegistrati.push(newData);
+      if (!response.ok) {
+        throw new Error("Errore durante la creazione dell'evento");
+      }
 
-      localStorage.setItem("eventi", JSON.stringify(utentiRegistrati));
-
-      console.log("Dati salvati con successo!", utentiRegistrati);
+      console.log("Dati salvati con successo!");
 
       navTo("/home");
     } catch (error) {
