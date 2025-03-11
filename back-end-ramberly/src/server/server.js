@@ -58,7 +58,7 @@ app.get("/home", authorize, getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
-app.post("/events/:userId", insertEvents);
+app.post("/events/:userId", upload.single('map_img'), insertEvents);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
 app.get("/eventsAvatar", getEventsAvatar);

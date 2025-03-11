@@ -432,23 +432,18 @@ export function MapComponent(width) {
   };
   const takeScreenshot = async () => {
     if (!mapContainerRef.current) return null;
-
+  
     return new Promise((resolve, reject) => {
-      html2canvas(mapContainerRef.current)
+      html2canvas(mapContainerRef.current, { scale: 4 }) // 🔥 Riduci la risoluzione
         .then((canvas) => {
-          canvas.toBlob((blob) => {
-            if (blob) {
-              const url = URL.createObjectURL(blob);
-              localStorage.setItem("mapScreenshotURL", url);
-              resolve(url); // Restituisce l'URL dello screenshot
-            } else {
-              reject(new Error("Errore nel creare il blob"));
-            }
-          }, "image/png");
+          const base64Image = canvas.toDataURL("image/jpeg"); // 🔥 JPEG per ridurre dimensioni
+          console.log("🔍 Base64 generato:", base64Image); // 👀 Debug
+          resolve(base64Image); // 🔥 Restituisce direttamente la stringa Base64
         })
         .catch(reject);
     });
   };
+  
   //con getAddress ci è possibile catturare la posizione di un marker e ricavare la via e il nome della citta.
   useEffect(() => {
     if (position && position.length === 2) {

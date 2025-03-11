@@ -73,7 +73,7 @@ export function EventiPreferiti() {
                 <div className="info-evento-preferiti">
                   <div className="map-preferiti">
                     <img
-                      src={evento.map_img}
+                      src= {evento.map_img_base64 ? `data:image/png;base64,${evento.map_img_base64}` : "src/assets/placeholder.png"}
                       width={150}
                       alt="Mappa"
                       className="mappa"

@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { MapComponent } from "./MapComponent";
 import { useUserContext } from "../contesti/useContext";
 
+
 export function CreaEvento() {
   const {
     setSuggestions,
@@ -33,7 +34,7 @@ export function CreaEvento() {
     calculateRoute,
     position,
   } = MapComponent();
-  const { user, setParticipatedEvents } = useUserContext();
+  const { user, setParticipatedEvents , fetchAllEvents } = useUserContext();
   const [data, setData] = useState({
     nome_evento: "",
     start: "",
@@ -90,46 +91,54 @@ export function CreaEvento() {
   const userId = user.id;
   const handleSubmitEvent = async (event) => {
     event.preventDefault();
-
+  
     try {
-      const screenshotUrl = await takeScreenshot();
-
-      if (!screenshotUrl) {
+      const base64map = await takeScreenshot();
+  
+      if (!base64map) {
         throw new Error("Screenshot non acquisito");
       }
-
-      const newData = {
-        ...data,
-        id_creatore: user.id,
-        distanza: distance,
-        map_img: screenshotUrl,
-        partecipa: false,
-      };
-
+  
+      // 🔥 Converte Base64 in Blob
+      const blob = await fetch(base64map).then((res) => res.blob());
+      const file = new File([blob], "screenshot.png", { type: "image/png" });
+  
+      // 🔥 Invia il file con FormData
+      const formData = new FormData();
+      formData.append("id_creatore", user.id);
+      formData.append("nome_evento", data.nome_evento);
+      formData.append("start", data.start);
+      formData.append("finish", data.finish);
+      formData.append("distanza", distance);
+      formData.append("orario", data.orario);
+      formData.append("data", data.data);
+      formData.append("partecipa", false);
+      formData.append("map_img", file); // ✅ Invia il file binario correttamente
+  
       const response = await fetch(`http://localhost:5001/events/${userId}`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newData),
+        body: formData, // ✅ FormData gestisce automaticamente il Content-Type
       });
-
+  
       if (!response.ok) {
         throw new Error("Errore durante la creazione dell'evento");
       }
+      const newEvent = await response.json();
 
+      
+      await fetchAllEvents()
+      
+      setParticipatedEvents((prevData)=>[
+        ...prevData,
+        newEvent
+      ])
       console.log("Dati salvati con successo!");
-      const updatedEventsResponse = await fetch("http://localhost:5001/events");
-      if (!updatedEventsResponse.ok) {
-        throw new Error("Errore nel recupero degli eventi aggiornati");
-      }
-
-      const updatedEvents = await updatedEventsResponse.json();
-      setParticipatedEvents((prevData) => [...prevData, updatedEvents]);
-
       navTo("/home");
     } catch (error) {
       console.error("Errore nel salvataggio:", error);
     }
   };
+  
 
   return (
     <div>

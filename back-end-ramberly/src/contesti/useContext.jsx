@@ -1,6 +1,8 @@
 import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
+import { getEventsAvatar } from "../server/controllers/controllers";
+
 
 export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
@@ -120,6 +122,7 @@ export function UserProvider({ children }) {
       }
       const eventsData = await response.json();
       setEvents(eventsData);
+      
     } catch (error) {
       console.error({ message: "errore nel fetching", error });
     }
@@ -220,6 +223,8 @@ export function UserProvider({ children }) {
         setParticipatedEvents,
         eventsAvatar,
         usersAvatar,
+        fetchAllEvents,
+        
       }}
     >
       {children}

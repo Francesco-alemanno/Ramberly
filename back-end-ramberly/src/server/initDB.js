@@ -1,6 +1,6 @@
 import pgPromise from "pg-promise";
 import dotenv from "dotenv";
-import fs from "fs";
+import fs from 'fs';
 import path from "path";
 import { fileURLToPath } from "url";
 dotenv.config();
@@ -8,13 +8,13 @@ const URL = process.env.URL;
 
 // export const db = pgPromise()(URL);
 
-export const db = pgPromise()(
-  "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
-);
-
 // export const db = pgPromise()(
-//   "postgresql://postgres:Fingerskate1@localhost:5432/ramberly"
+//   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
 // );
+
+export const db = pgPromise()(
+  "postgresql://postgres:Fingerskate1@localhost:5432/ramberly"
+);
 
 const readImage = (filePath) => {
   return fs.readFileSync(path.resolve(filePath)); // Legge il file e restituisce un buffer
@@ -92,7 +92,7 @@ const setupDb = async () => {
         nome_evento TEXT,
         start TEXT,
         finish TEXT,
-        map_img TEXT,
+        map_img BYTEA,
         distanza DECIMAL(10,2),
         orario TIME,
         data DATE,
@@ -101,49 +101,17 @@ const setupDb = async () => {
         difficolta CHAR(1)
       );
     `);
-    //     await db.none(`INSERT INTO eventi (id_creatore,nome_evento, start, finish, map_img, distanza, orario, data,partecipanti, privacy,difficolta) VALUES
-    // (
-
-    //   1,
-    //   'corsetta mattutina',
-    //   'Via della Moscova, Milano',
-    //   'Corso Como, Milano',
-    //   'src/assets/placeholder-mappa/map-placeholder.png',
-    //   12.2,
-    //   '16:00',
-    //   '2025-02-24',
-    //   ARRAY[2,3]::INTEGER[],
-    //   '1',
-    //   NULL
-    // ),
-    // (
-
-    //   2,
-    //   'corsetta pomeridiana',
-    //   'Via del Corso, Roma',
-    //   'Via dei Condotti, Roma',
-    //   'src/assets/placeholder-mappa/map-placeholder(2).png',
-    //   8.1,
-    //   '15:00',
-    //   '2025-01-18',
-    //   ARRAY[4,5]::INTEGER[],
-    //   '1',
-    //   NULL
-    // ),
-    // (
-
-    //   3,
-    //   'passeggiata notturna',
-    //   'Via Roma, Torino',
-    //   'Via Trinchese, Torino',
-    //   'src/assets/placeholder-mappa/map-placeholder(3).png',
-    //   4.4,
-    //   '10:00',
-    //   '2025-04-05',
-    //   ARRAY[6,7,8,9]::INTEGER[],
-    //   '1',
-    //   NULL
-    // );`);
+    // await db.none(
+    //   `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data, partecipanti, privacy, difficolta) VALUES
+    //   ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11),
+    //   ($12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22),
+    //   ($23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)`,
+    //   [
+    //     1, 'corsetta mattutina', 'Via della Moscova, Milano', 'Corso Como, Milano', readImage("../assets/placeholder-mappa/map-placeholder.png"), 12.2, '16:00', '2025-02-24', [2, 3], '1', null,
+    //     2, 'corsetta pomeridiana', 'Via del Corso, Roma', 'Via dei Condotti, Roma', readImage("../assets/placeholder-mappa/map-placeholder(2).png"), 8.1, '15:00', '2025-01-18', [4, 5], '1', null,
+    //     3, 'passeggiata notturna', 'Via Roma, Torino', 'Via Trinchese, Torino', readImage("../assets/placeholder-mappa/map-placeholder(3).png"), 4.4, '10:00', '2025-04-05', [6, 7, 8, 9], '1', null
+    //   ]
+    // );
 
     console.log("Tabelle create correttamente");
   } catch (error) {

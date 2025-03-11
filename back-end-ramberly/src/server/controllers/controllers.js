@@ -211,7 +211,7 @@ export const getUsersAvatar = async (req, res) => {
 export const getAllEvents = async (req, res) => {
   try {
     const events =
-      await db.many(`SELECT eventi.*, users.nome, users.img, users.livello 
+      await db.many(`SELECT eventi.*, users.nome,  COALESCE(encode(eventi.map_img, 'base64'), '') AS map_img_base64, users.livello 
       FROM eventi 
       JOIN users ON eventi.id_creatore = users.id`);
     return res.status(200).json(events);
@@ -243,9 +243,10 @@ WHERE $1 = ANY(eventi.partecipanti)`,
 export const insertEvents = async (req, res) => {
   const { userId } = req.params;
   try {
-    const { nome_evento, start, finish, map_img, distanza, orario, data } =
+    const { nome_evento, start, finish,  distanza, orario, data } =
       req.body;
-    const newEvent = await db.none(
+      const map_img = req.file.buffer
+     await db.none(
       `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data ) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)`,
       [userId, nome_evento, start, finish, map_img, distanza, orario, data]
     );
@@ -255,6 +256,7 @@ export const insertEvents = async (req, res) => {
     res.status(500).json({ message: "Errore nel server" });
   }
 };
+
 
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;

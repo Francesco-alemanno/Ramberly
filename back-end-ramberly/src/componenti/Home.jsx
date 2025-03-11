@@ -17,25 +17,13 @@ export function Home() {
     handlePartecipa,
     avatar,
     eventsAvatar,
+    fetchAllEvents,
+    
   } = useUserContext();
+  useEffect(()=>{
+    fetchAllEvents()
+  },[participatedEvents])
 
-  // useEffect(() => {
-  //   async function getEventsAvatars() {
-  //     try {
-  //       const response = await fetch("http://localhost:5001/eventsAvatar");
-  //       if (response.ok) {
-  //         const responseData = await response.json();
-  //         setEventsAvatar(responseData);
-  //       } else {
-  //         throw new Error("Errore nel recupero degli Avatar degli eventi");
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   getEventsAvatars();
-  // }, []);
-  // console.log(eventsAvatar);
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -67,7 +55,10 @@ export function Home() {
     }
     loadPartecipanti();
   }, [participatedEvents]);
-
+  useEffect(()=>{
+    console.log(participatedEvents)
+    },[participatedEvents])
+   
   return (
     <div className="home-container">
       <div className="nav-top-home">
@@ -99,6 +90,8 @@ export function Home() {
             const eventoAvatar = eventsAvatar?.find(
               (e) => e.id_evento === evento.id_evento
             );
+           
+            
             return (
               <div key={index} className="home-slide">
                 <div className="home">
@@ -142,7 +135,7 @@ export function Home() {
                     </div>
                   </div>
                   <div className="descrizione-evento">
-                    <h3>{evento.nome_evento.toUpperCase()}</h3>
+                    <h3>{evento.nome_evento}</h3>
                     <div className="start-finish-box">
                       <div className="start-finish">
                         <img
@@ -165,7 +158,7 @@ export function Home() {
                   </div>
                   <div className="map-container">
                     <img
-                      src={evento.map_img}
+                      src= {evento.map_img_base64 ? `data:image/png;base64,${evento.map_img_base64}` : "src/assets/placeholder.png"}
                       width={290}
                       alt="Mappa"
                       className="mappa"
