@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 
 export function PotrestiConoscere() {
-  const { users, userId } = useUserContext();
+  const { users, userId, usersAvatar } = useUserContext();
   const [seguendo, setSeguendo] = useState([]);
 
   const navTo = useNavigate();
@@ -76,24 +76,37 @@ export function PotrestiConoscere() {
         </div>
         <div className="list-container">
           <ul>
-            {users.map((profile) => (
-              <li key={profile.id} className="user-item">
-                <div className="user-avatar">
-                  <img src={profile.img} alt={`avatar ${profile.nome}`} />
-                </div>
-                <div className="user-info">
-                  <span className="user-name"> {profile.nome}</span>
-                  <span className="user-lev">
-                    livello:{` ${profile.livello}`}{" "}
-                  </span>
-                </div>
-                <button onClick={() => handleAddProfile(profile)}>
-                  {seguendo.some((utente) => utente.email === profile.email)
-                    ? "👤-"
-                    : "👤+"}
-                </button>
-              </li>
-            ))}
+            {users.map((profile) => {
+              const profileAvatar = usersAvatar?.find(
+                (e) => e.user_id === profile.id
+              );
+
+              return (
+                <li key={profile.id} className="user-item">
+                  <div className="user-avatar">
+                    <img
+                      src={
+                        profileAvatar
+                          ? `data:image/png;base64,${profileAvatar.user_avatar_base64}`
+                          : "src/assets/default-avatar.png"
+                      }
+                      alt={`avatar ${profile.nome}`}
+                    />
+                  </div>
+                  <div className="user-info">
+                    <span className="user-name"> {profile.nome}</span>
+                    <span className="user-lev">
+                      livello:{` ${profile.livello}`}{" "}
+                    </span>
+                  </div>
+                  <button onClick={() => handleAddProfile(profile)}>
+                    {seguendo.some((utente) => utente.email === profile.email)
+                      ? "👤-"
+                      : "👤+"}
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </div>
 

@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  const [eventsAvatar, setEventsAvatar] = useState();
+  // const [eventsAvatar, setEventsAvatar] = useState();
   const [eventParticipants, setEventParticipants] = useState({});
 
   const {
@@ -16,29 +16,27 @@ export function Home() {
     handleDeletePartecipa,
     handlePartecipa,
     avatar,
+    eventsAvatar,
   } = useUserContext();
 
+  // useEffect(() => {
+  //   async function getEventsAvatars() {
+  //     try {
+  //       const response = await fetch("http://localhost:5001/eventsAvatar");
+  //       if (response.ok) {
+  //         const responseData = await response.json();
+  //         setEventsAvatar(responseData);
+  //       } else {
+  //         throw new Error("Errore nel recupero degli Avatar degli eventi");
+  //       }
+  //     } catch (error) {
+  //       console.error(error);
+  //     }
+  //   }
+  //   getEventsAvatars();
+  // }, []);
+  // console.log(eventsAvatar);
 
-  useEffect(() => {
-    async function getEventsAvatars() {
-      try {
-        const response = await fetch("http://localhost:5001/eventsAvatar");
-        if (response.ok) {
-          const responseData = await response.json();
-          setEventsAvatar(responseData);
-        } else {
-          throw new Error("Errore nel recupero degli Avatar degli eventi");
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    }
-    getEventsAvatars();
-  }, []);
-  console.log(eventsAvatar);
-
-  
-  
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlers = useSwipeable({
@@ -70,12 +68,8 @@ export function Home() {
     loadPartecipanti();
   }, [participatedEvents]);
 
-  console.log(participatedEvents);
-  
   return (
-    
     <div className="home-container">
-      
       <div className="nav-top-home">
         <div style={{ marginLeft: "10px" }}>
           <img src="src/assets/loghi/logo.svg" width={70} alt="" />
@@ -102,133 +96,152 @@ export function Home() {
           }}
         >
           {participatedEvents.map((evento, index) => {
-            
-            const eventoAvatar = eventsAvatar?.find(e => e.id_evento === evento.id_evento);
-            return(
-            
-            
-            <div key={index} className="home-slide">
-              <div className="home">
-                <div className="nav-post">
-                  <div className="nav-post-user-info">
-                    <img id="post-avatar" src={eventoAvatar ? `data:image/png;base64,${eventoAvatar.user_avatar_base64}` : "src/assets/default-avatar.png"} alt="user-icon" />
-                    <div className="post-info-container">
-                      <div className="post-user-info">
-                        <h3>{evento.nome}</h3>
-                        <h5 style={{ color: "#f7a441" }}>Amici</h5>
-                        <a>
-                          <img
-                            id="post-settings-icon"
-                            src="\friends-svgrepo-com.svg"
-                            alt="post settings"
-                          />
-                        </a>
-                      </div>
-                      <h5>Livello {evento.livello}</h5>
-                    </div>
-                  </div>
-                  <div className="icons-container">
-                    <button style={{ backgroundColor: "#0B4C3B" }}>Chat</button>
-                    <a>
+            const eventoAvatar = eventsAvatar?.find(
+              (e) => e.id_evento === evento.id_evento
+            );
+            return (
+              <div key={index} className="home-slide">
+                <div className="home">
+                  <div className="nav-post">
+                    <div className="nav-post-user-info">
                       <img
-                        id="post-settings-icon"
-                        src="\dots-horizontal-svgrepo-com.svg"
-                        alt="post settings"
+                        id="post-avatar"
+                        src={
+                          eventoAvatar
+                            ? `data:image/png;base64,${eventoAvatar.user_avatar_base64}`
+                            : "src/assets/default-avatar.png"
+                        }
+                        alt="user-icon"
                       />
-                    </a>
-                  </div>
-                </div>
-                <div className="descrizione-evento">
-                  <h3>{evento.nome_evento.toUpperCase()}</h3>
-                  <div className="start-finish-box">
-                    <div className="start-finish">
-                      <img src="src/assets/icons/start.svg" alt="start-flag" />
-                      <span>START</span>
-                      <p>{evento.start}</p>
+                      <div className="post-info-container">
+                        <div className="post-user-info">
+                          <h3>{evento.nome}</h3>
+                          <h5 style={{ color: "#f7a441" }}>Amici</h5>
+                          <a>
+                            <img
+                              id="post-settings-icon"
+                              src="\friends-svgrepo-com.svg"
+                              alt="post settings"
+                            />
+                          </a>
+                        </div>
+                        <h5>Livello {evento.livello}</h5>
+                      </div>
                     </div>
-                    <hr />
-                    <div className="start-finish">
-                      <img src="src/assets/icons/start.svg" alt="start-flag" />
-                      <span>FINISH</span>
-                      <p>{evento.finish}</p>
+                    <div className="icons-container">
+                      <button style={{ backgroundColor: "#0B4C3B" }}>
+                        Chat
+                      </button>
+                      <a>
+                        <img
+                          id="post-settings-icon"
+                          src="\dots-horizontal-svgrepo-com.svg"
+                          alt="post settings"
+                        />
+                      </a>
                     </div>
                   </div>
-                </div>
-                <div className="map-container">
-                  <img
-                    src={evento.map_img}
-                    width={290}
-                    alt="Mappa"
-                    className="mappa"
-                  />
-                </div>
-                <div className="container-partecipanti">
-                  <button className="red-btn">Difficile</button>
-                  <div className="icons-partecipanti">
+                  <div className="descrizione-evento">
+                    <h3>{evento.nome_evento.toUpperCase()}</h3>
+                    <div className="start-finish-box">
+                      <div className="start-finish">
+                        <img
+                          src="src/assets/icons/start.svg"
+                          alt="start-flag"
+                        />
+                        <span>START</span>
+                        <p>{evento.start}</p>
+                      </div>
+                      <hr />
+                      <div className="start-finish">
+                        <img
+                          src="src/assets/icons/start.svg"
+                          alt="start-flag"
+                        />
+                        <span>FINISH</span>
+                        <p>{evento.finish}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="map-container">
                     <img
-                      src="src\assets\icons\partecipanti.svg"
-                      width={70}
-                      alt="partecipanti"
+                      src={evento.map_img}
+                      width={290}
+                      alt="Mappa"
+                      className="mappa"
                     />
                   </div>
-                  <span style={{ fontSize: 12 }}>
-                    {eventParticipants[evento.id_evento]?.length > 0
-                      ? `${eventParticipants[evento.id_evento][0]} e altri ${
-                          eventParticipants[evento.id_evento].length - 1
-                        } stanno partecipando!`
-                      : "Nessun partecipante"}
-                  </span>
+                  <div className="container-partecipanti">
+                    <button className="red-btn">Difficile</button>
+                    <div className="icons-partecipanti">
+                      <img
+                        src="src\assets\icons\partecipanti.svg"
+                        width={70}
+                        alt="partecipanti"
+                      />
+                    </div>
+                    <span style={{ fontSize: 12 }}>
+                      {eventParticipants[evento.id_evento]?.length > 0
+                        ? `${eventParticipants[evento.id_evento][0]} e altri ${
+                            eventParticipants[evento.id_evento].length - 1
+                          } stanno partecipando!`
+                        : "Nessun partecipante"}
+                    </span>
+                  </div>
+                  <div className="info-percorso">
+                    <div className="info-box">
+                      <img
+                        src="src\assets\icons\kilometers.svg"
+                        alt="distanza"
+                      />
+                      <div className="info-box-text">
+                        <h3>{evento.distanza}</h3>
+                        <span>km</span>
+                      </div>
+                    </div>
+                    <hr />
+                    <div className="info-box">
+                      <img src="src\assets\icons\clock.svg" alt="orario" />
+                      <div className="info-box-text">
+                        <h3>{evento.orario.slice(0, 5)}</h3>
+                        <span>hr</span>
+                      </div>
+                    </div>
+                    <hr />
+                    <div className="info-box">
+                      <img src="/src/assets/icons/calendar.svg" alt="data" />
+                      <div className="info-box-text">
+                        <h3>{new Date(evento.data).toLocaleDateString()}</h3>{" "}
+                        {/*Riconvertiamo in sola data*/}
+                        <span>data</span>
+                      </div>
+                    </div>
+                  </div>
+                  {!evento.partecipa ? (
+                    <button
+                      onClick={() => handlePartecipa(user.id, evento.id_evento)}
+                      style={{ fontSize: "18px", color: "white" }}
+                    >
+                      Partecipa!
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() =>
+                        handleDeletePartecipa(user.id, evento.id_evento)
+                      }
+                      style={{
+                        fontSize: "18px",
+                        backgroundColor: "red",
+                        color: "white",
+                      }}
+                    >
+                      Abbandona
+                    </button>
+                  )}
                 </div>
-                <div className="info-percorso">
-                  <div className="info-box">
-                    <img src="src\assets\icons\kilometers.svg" alt="distanza" />
-                    <div className="info-box-text">
-                      <h3>{evento.distanza}</h3>
-                      <span>km</span>
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="info-box">
-                    <img src="src\assets\icons\clock.svg" alt="orario" />
-                    <div className="info-box-text">
-                      <h3>{evento.orario.slice(0, 5)}</h3>
-                      <span>hr</span>
-                    </div>
-                  </div>
-                  <hr />
-                  <div className="info-box">
-                    <img src="/src/assets/icons/calendar.svg" alt="data" />
-                    <div className="info-box-text">
-                      <h3>{new Date(evento.data).toLocaleDateString()}</h3>{" "}
-                      {/*Riconvertiamo in sola data*/}
-                      <span>data</span>
-                    </div>
-                  </div>
-                </div>
-                {!evento.partecipa ? (
-                  <button
-                    onClick={() => handlePartecipa(user.id, evento.id_evento)}
-                    style={{ fontSize: "18px", color: "white" }}
-                  >
-                    Partecipa!
-                  </button>
-                ) : (
-                  <button
-                    onClick={() =>
-                      handleDeletePartecipa(user.id, evento.id_evento)
-                    }
-                    style={{
-                      fontSize: "18px",
-                      backgroundColor: "red",
-                      color: "white",
-                    }}
-                  >
-                    Abbandona
-                  </button>
-                )}
               </div>
-            </div>
-          )})}
+            );
+          })}
         </div>
       </div>
       <div className="carousel-dots">

@@ -2,7 +2,6 @@ import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
 
-
 export const UserContext = createContext();
 export const useUserContext = () => useContext(UserContext);
 
@@ -18,6 +17,8 @@ export function UserProvider({ children }) {
     }))
   );
   const [avatar, setAvatar] = useState(null);
+  const [eventsAvatar, setEventsAvatar] = useState();
+  const [usersAvatar, setUsersAvatar] = useState();
 
   useEffect(() => {
     const updatedEvents = events.map((evento) => ({
@@ -90,6 +91,24 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     fetchAllUsers();
+  }, []);
+
+  //fetch avatar di tutti gli utenti dal database
+  useEffect(() => {
+    async function getUsersAvatar() {
+      try {
+        const response = await fetch("http://localhost:5001/usersAvatar");
+        if (response.ok) {
+          const responseData = await response.json();
+          setUsersAvatar(responseData);
+        } else {
+          throw new Error("Errore nel recupero degli Avatar degli utenti");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getUsersAvatar();
   }, []);
 
   // fetch utenti dal database
@@ -166,23 +185,23 @@ export function UserProvider({ children }) {
       console.error(error);
     }
   }
-  // useEffect(()=>{
-  //   async function getEventsAvatars() {
-  //     try {
-  //       const response = await fetch("http://localhost:5001/eventsAvatar");
-  //       if (response.ok) {
-  //         const responseData = await response.json();
-  //         setEventsAvatar(responseData)
-  //       } else {
-  //         throw new Error("Errore nel recupero degli Avatar degli eventi");
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   getEventsAvatars()
-  // },[])
-  
+
+  useEffect(() => {
+    async function getEventsAvatars() {
+      try {
+        const response = await fetch("http://localhost:5001/eventsAvatar");
+        if (response.ok) {
+          const responseData = await response.json();
+          setEventsAvatar(responseData);
+        } else {
+          throw new Error("Errore nel recupero degli Avatar degli eventi");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getEventsAvatars();
+  }, []);
 
   return (
     <UserContext.Provider
@@ -199,7 +218,8 @@ export function UserProvider({ children }) {
         participatedEvents,
         avatar,
         setParticipatedEvents,
-        
+        eventsAvatar,
+        usersAvatar,
       }}
     >
       {children}

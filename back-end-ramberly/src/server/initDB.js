@@ -1,20 +1,21 @@
 import pgPromise from "pg-promise";
 import dotenv from "dotenv";
-import fs from 'fs'
-import path from 'path'
-import { fileURLToPath } from "url"
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
 dotenv.config();
 const URL = process.env.URL;
 
 // export const db = pgPromise()(URL);
 
+export const db = pgPromise()(
+  "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
+);
+
 // export const db = pgPromise()(
-//   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
+//   "postgresql://postgres:Fingerskate1@localhost:5432/ramberly"
 // );
 
-export const db = pgPromise()(
-  "postgresql://postgres:Fingerskate1@localhost:5432/ramberly"
-);
 const readImage = (filePath) => {
   return fs.readFileSync(path.resolve(filePath)); // Legge il file e restituisce un buffer
 };
@@ -102,7 +103,7 @@ const setupDb = async () => {
     `);
     //     await db.none(`INSERT INTO eventi (id_creatore,nome_evento, start, finish, map_img, distanza, orario, data,partecipanti, privacy,difficolta) VALUES
     // (
-      
+
     //   1,
     //   'corsetta mattutina',
     //   'Via della Moscova, Milano',
@@ -116,7 +117,7 @@ const setupDb = async () => {
     //   NULL
     // ),
     // (
-    
+
     //   2,
     //   'corsetta pomeridiana',
     //   'Via del Corso, Roma',
@@ -130,7 +131,7 @@ const setupDb = async () => {
     //   NULL
     // ),
     // (
-      
+
     //   3,
     //   'passeggiata notturna',
     //   'Via Roma, Torino',

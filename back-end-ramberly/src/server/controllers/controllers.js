@@ -194,6 +194,20 @@ export const getAllUsers = async (req, res) => {
   }
 };
 
+export const getUsersAvatar = async (req, res) => {
+  try {
+    const result = await db.manyOrNone(`
+      SELECT 
+        id AS user_id, 
+        encode(img, 'base64') AS user_avatar_base64
+      FROM users;
+    `);
+    res.status(200).json(result);
+  } catch (error) {
+    return res.status(500).json({ message: `Errore nella richiesta`, error });
+  }
+};
+
 export const getAllEvents = async (req, res) => {
   try {
     const events =
@@ -310,8 +324,8 @@ export const getEventsAvatar = async (req, res) => {
     eventi.id_evento,  
     users.id AS user_id, 
     encode(users.img, 'base64') AS user_avatar_base64
-FROM eventi
-JOIN users ON eventi.id_creatore = users.id;`);
+    FROM eventi
+    JOIN users ON eventi.id_creatore = users.id;`);
     res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });

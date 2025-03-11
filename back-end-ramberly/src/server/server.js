@@ -19,6 +19,7 @@ import {
   logout,
   getEventiPreferiti,
   getEventsAvatar,
+  getUsersAvatar,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
@@ -44,7 +45,8 @@ app.put("/caratteristiche/:userId", aggiornaCaratteristiche);
 app.put("/scegliSport/:userId", sportPreferito);
 app.put("/potrestiConoscere/:userId", followUser);
 app.put("/scegliAvatar/:userId", upload.single("img"), scegliAvatar);
-app.get('/avatar/:userId', getAvatar)
+app.get("/avatar/:userId", getAvatar);
+app.get("/usersAvatar", getUsersAvatar);
 // ------------
 
 // flusso login/logout
@@ -59,7 +61,7 @@ app.put("/events", updateEventUser);
 app.post("/events/:userId", insertEvents);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
-app.get('/eventsAvatar', getEventsAvatar)
+app.get("/eventsAvatar", getEventsAvatar);
 
 // Eventi preferiti
 app.get("/eventiPreferiti/:userId", getEventiPreferiti);

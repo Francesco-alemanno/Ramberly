@@ -86,6 +86,7 @@ export function CreaEvento() {
   }, [data]);
 
   const navTo = useNavigate();
+
   const userId = user.id;
   const handleSubmitEvent = async (event) => {
     event.preventDefault();
@@ -122,10 +123,8 @@ export function CreaEvento() {
       }
 
       const updatedEvents = await updatedEventsResponse.json();
-      setParticipatedEvents(updatedEvents); 
+      setParticipatedEvents((prevData) => [...prevData, updatedEvents]);
 
-      
-      
       navTo("/home");
     } catch (error) {
       console.error("Errore nel salvataggio:", error);
