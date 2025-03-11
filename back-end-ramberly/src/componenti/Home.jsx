@@ -6,18 +6,39 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
+  const [eventsAvatar, setEventsAvatar] = useState();
+  const [eventParticipants, setEventParticipants] = useState({});
+
   const {
     user,
     fetchEventParticipants,
     participatedEvents,
     handleDeletePartecipa,
     handlePartecipa,
-    avatar
+    avatar,
   } = useUserContext();
 
 
-  const [eventParticipants, setEventParticipants] = useState({});
+  useEffect(() => {
+    async function getEventsAvatars() {
+      try {
+        const response = await fetch("http://localhost:5001/eventsAvatar");
+        if (response.ok) {
+          const responseData = await response.json();
+          setEventsAvatar(responseData);
+        } else {
+          throw new Error("Errore nel recupero degli Avatar degli eventi");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getEventsAvatars();
+  }, []);
+  console.log(eventsAvatar);
 
+  
+  
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
   const handlers = useSwipeable({
@@ -34,7 +55,7 @@ export function Home() {
       setCurrentIndex((prev) => prev - 1);
     }
   };
-  
+
   // ad ogni cambiamento degli eventi relativo all'utente loggato, viene creato un oggetto che contiene come chiavi gli id degli eventi e come valori un array con i nomi dei partecipanti
   useEffect(() => {
     async function loadPartecipanti() {
@@ -49,8 +70,12 @@ export function Home() {
     loadPartecipanti();
   }, [participatedEvents]);
 
+  console.log(participatedEvents);
+  
   return (
+    
     <div className="home-container">
+      
       <div className="nav-top-home">
         <div style={{ marginLeft: "10px" }}>
           <img src="src/assets/loghi/logo.svg" width={70} alt="" />
@@ -76,12 +101,17 @@ export function Home() {
             transition: "transform 0.3s ease-out",
           }}
         >
-          {participatedEvents.map((evento, index) => (
+          {participatedEvents.map((evento, index) => {
+            
+            const eventoAvatar = eventsAvatar?.find(e => e.id_evento === evento.id_evento);
+            return(
+            
+            
             <div key={index} className="home-slide">
               <div className="home">
                 <div className="nav-post">
                   <div className="nav-post-user-info">
-                    <img id="post-avatar" src={evento.img} alt="user-icon" />
+                    <img id="post-avatar" src={eventoAvatar ? `data:image/png;base64,${eventoAvatar.user_avatar_base64}` : "src/assets/default-avatar.png"} alt="user-icon" />
                     <div className="post-info-container">
                       <div className="post-user-info">
                         <h3>{evento.nome}</h3>
@@ -126,7 +156,7 @@ export function Home() {
                 </div>
                 <div className="map-container">
                   <img
-                    src={evento.img}
+                    src={evento.map_img}
                     width={290}
                     alt="Mappa"
                     className="mappa"
@@ -161,7 +191,7 @@ export function Home() {
                   <div className="info-box">
                     <img src="src\assets\icons\clock.svg" alt="orario" />
                     <div className="info-box-text">
-                      <h3>{evento.orario.slice(0, -3)}</h3>
+                      <h3>{evento.orario.slice(0, 5)}</h3>
                       <span>hr</span>
                     </div>
                   </div>
@@ -198,7 +228,7 @@ export function Home() {
                 )}
               </div>
             </div>
-          ))}
+          )})}
         </div>
       </div>
       <div className="carousel-dots">

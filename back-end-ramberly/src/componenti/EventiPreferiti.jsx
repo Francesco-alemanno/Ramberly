@@ -1,10 +1,28 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
+import { useEffect, useState } from "react";
 
 export function EventiPreferiti() {
   const { user, participatedEvents, handleDeletePartecipa } = useUserContext();
-
+const [eventsAvatar, setEventsAvatar] = useState();
   const navTo = useNavigate();
+
+useEffect(() => {
+    async function getEventsAvatars() {
+      try {
+        const response = await fetch("http://localhost:5001/eventsAvatar");
+        if (response.ok) {
+          const responseData = await response.json();
+          setEventsAvatar(responseData);
+        } else {
+          throw new Error("Errore nel recupero degli Avatar degli eventi");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    }
+    getEventsAvatars();
+  }, []);
 
   return (
     <>
@@ -32,10 +50,13 @@ export function EventiPreferiti() {
       {participatedEvents.filter((evento) => evento.partecipa).length > 0 ? (
         participatedEvents
           .filter((evento) => evento.partecipa)
-          .map((evento, index) => (
+          .map((evento, index) => {
+            const eventoAvatar = eventsAvatar?.find(e => e.id_evento === evento.id_evento);
+
+           return (
             <div className="eventi-preferiti" key={index}>
               <div className="utente-titolo">
-                <img id="post-avatar" src={evento.img} alt="user-icon" />
+                <img id="post-avatar" src={eventoAvatar ? `data:image/png;base64,${eventoAvatar.user_avatar_base64}` : "src/assets/default-avatar.png"} alt="user-icon" />
                 <div className="post-info-container">
                   <div className="post-user-info">
                     <h3>{evento.nome}</h3>
@@ -105,7 +126,7 @@ export function EventiPreferiti() {
                 </button>
               </div>
             </div>
-          ))
+          )})
       ) : (
         <p>Non ci sono eventi preferiti</p>
       )}

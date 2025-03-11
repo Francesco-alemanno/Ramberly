@@ -98,7 +98,7 @@ export const followUser = async (req, res) => {
 
 export const scegliAvatar = async (req, res) => {
   const { userId } = req.params;
-  const avatarBuffer = req.file.buffer
+  const avatarBuffer = req.file.buffer;
 
   try {
     await db.oneOrNone(
@@ -134,8 +134,14 @@ export const getAvatar = async (req, res) => {
 
     res.json({ img: `data:image/png;base64,${user.img}` });
   } catch (error) {
-    console.error("Errore nel recupero dell'avatar:", error.message, error.stack);
-    res.status(500).json({ message: "Errore durante il recupero dell'avatar."  });
+    console.error(
+      "Errore nel recupero dell'avatar:",
+      error.message,
+      error.stack
+    );
+    res
+      .status(500)
+      .json({ message: "Errore durante il recupero dell'avatar." });
   }
 };
 
@@ -221,16 +227,18 @@ WHERE $1 = ANY(eventi.partecipanti)`,
 };
 
 export const insertEvents = async (req, res) => {
+  const { userId } = req.params;
   try {
-    const { nome_evento, start, finish, map_img, distanza, orario, data} = req.body;
+    const { nome_evento, start, finish, map_img, distanza, orario, data } =
+      req.body;
     const newEvent = await db.none(
-      `INSERT INTO eventi (nome_evento, start, finish, map_img, distanza, orario, data ) VALUES ($1, $2, $3, $4, $5, $6, $7)`,
-      [nome_evento, start, finish,  map_img, distanza, orario, data]
+      `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data ) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)`,
+      [userId, nome_evento, start, finish, map_img, distanza, orario, data]
     );
-    return res.status(200).json({ message: "Evento aggiunto"});
+    return res.status(200).json({ message: "Evento aggiunto" });
   } catch (err) {
     console.error("Errore nei dati inseriti");
-    res.status(500).json({ message: "Errore nel server"});
+    res.status(500).json({ message: "Errore nel server" });
   }
 };
 
@@ -291,6 +299,20 @@ export const getEventParticipants = async (req, res) => {
       [id_evento]
     );
     return res.json(partecipanti);
+  } catch (error) {
+    return res.status(500).json({ message: `errore nella richiesta`, error });
+  }
+};
+
+export const getEventsAvatar = async (req, res) => {
+  try {
+    const result = await db.manyOrNone(`SELECT 
+    eventi.id_evento,  
+    users.id AS user_id, 
+    encode(users.img, 'base64') AS user_avatar_base64
+FROM eventi
+JOIN users ON eventi.id_creatore = users.id;`);
+    res.status(200).json(result);
   } catch (error) {
     return res.status(500).json({ message: `errore nella richiesta`, error });
   }

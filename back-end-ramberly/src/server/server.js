@@ -18,6 +18,7 @@ import {
   deleteEventUser,
   logout,
   getEventiPreferiti,
+  getEventsAvatar,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
@@ -55,9 +56,10 @@ app.get("/home", authorize, getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
-app.post("/events", insertEvents);
+app.post("/events/:userId", insertEvents);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
+app.get('/eventsAvatar', getEventsAvatar)
 
 // Eventi preferiti
 app.get("/eventiPreferiti/:userId", getEventiPreferiti);

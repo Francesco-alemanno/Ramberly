@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { MapComponent } from "./MapComponent";
+import { useUserContext } from "../contesti/useContext";
 
 export function CreaEvento() {
   const {
@@ -32,7 +33,7 @@ export function CreaEvento() {
     calculateRoute,
     position,
   } = MapComponent();
-
+  const { user, setParticipatedEvents } = useUserContext();
   const [data, setData] = useState({
     nome_evento: "",
     start: "",
@@ -41,7 +42,7 @@ export function CreaEvento() {
     orario: "",
     data: "",
     img: "",
-    partecipanti: ["Gianlorenzo", "Francesco", "Clarissa"],
+    partecipanti: [],
   });
 
   const inputRef = useRef(""); // Riferimento all'input
@@ -85,8 +86,8 @@ export function CreaEvento() {
   }, [data]);
 
   const navTo = useNavigate();
-
-  const handleSubmit = async (event) => {
+  const userId = user.id;
+  const handleSubmitEvent = async (event) => {
     event.preventDefault();
 
     try {
@@ -96,9 +97,15 @@ export function CreaEvento() {
         throw new Error("Screenshot non acquisito");
       }
 
-      const newData = { ...data, distanza: distance, img: screenshotUrl };
+      const newData = {
+        ...data,
+        id_creatore: user.id,
+        distanza: distance,
+        map_img: screenshotUrl,
+        partecipa: false,
+      };
 
-      const response = await fetch("http://localhost:5001/events", {
+      const response = await fetch(`http://localhost:5001/events/${userId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newData),
@@ -109,7 +116,16 @@ export function CreaEvento() {
       }
 
       console.log("Dati salvati con successo!");
+      const updatedEventsResponse = await fetch("http://localhost:5001/events");
+      if (!updatedEventsResponse.ok) {
+        throw new Error("Errore nel recupero degli eventi aggiornati");
+      }
 
+      const updatedEvents = await updatedEventsResponse.json();
+      setParticipatedEvents(updatedEvents); 
+
+      
+      
       navTo("/home");
     } catch (error) {
       console.error("Errore nel salvataggio:", error);
@@ -140,7 +156,7 @@ export function CreaEvento() {
 
       {/* ------------------------------------ */}
 
-      <form className="crea-evento-box" onSubmit={handleSubmit}>
+      <form className="crea-evento-box" onSubmit={handleSubmitEvent}>
         <div className="cerca-evento"></div>
 
         {/* ----------------------- */}
