@@ -1,0 +1,265 @@
+import { useNavigate } from "react-router-dom";
+import { useUserContext } from "../contesti/useContext";
+import { useSwipeable } from "react-swipeable";
+import { useState } from "react";
+
+export function Home() {
+  const { userLogged, personeRandom } = useUserContext();
+  const [participatedEvents, setParticipatedEvents] = useState({});
+
+  const navTo = useNavigate();
+
+  const events = localStorage.getItem("eventi");
+  const parseEvents = JSON.parse(events);
+  const parseUsers = JSON.parse(localStorage.getItem("users"));
+  const parseUser = JSON.parse(localStorage.getItem("user"));
+
+  // logica carosello
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const handlers = useSwipeable({
+    onSwipedLeft: () => handleSwipe("left"),
+    onSwipedRight: () => handleSwipe("right"),
+    trackMouse: true,
+  });
+
+  const handleSwipe = (direction) => {
+    if (direction === "left" && currentIndex < parseEvents.length - 1) {
+      setCurrentIndex((prev) => prev + 1);
+    }
+    if (direction === "right" && currentIndex > 0) {
+      setCurrentIndex((prev) => prev - 1);
+    }
+  };
+
+  // funzioni bottone partecipa
+  const findUser = parseUsers.findIndex(
+    (user) => user.email === parseUser.email
+  );
+
+  function handlePartecipa(evento) {
+    if (!parseUsers[findUser].eventi_preferiti) {
+      parseUsers[findUser].eventi_preferiti = [];
+    }
+    parseUsers[findUser].eventi_preferiti.push(evento);
+    localStorage.setItem("users", JSON.stringify(parseUsers));
+    setParticipatedEvents({
+      ...participatedEvents,
+      [evento.id]: true, // Aggiungi l'evento come "partecipato"
+    });
+  }
+
+  function handleRemovePartecipa(evento) {
+    if (parseUsers[findUser].eventi_preferiti) {
+      const currentEvent = parseUsers[findUser].eventi_preferiti.findIndex(
+        (index) => index.id === evento.id
+      );
+      if (currentEvent !== -1) {
+        parseUsers[findUser].eventi_preferiti.splice(currentEvent, 1);
+        localStorage.setItem("users", JSON.stringify(parseUsers));
+      }
+    }
+    setParticipatedEvents({
+      ...participatedEvents,
+      [evento.id]: false, // Rimuovi l'evento come "partecipato"
+    });
+  }
+
+  return (
+    <div className="home-container">
+      <div className="nav-top-home">
+        <div style={{ marginLeft: "10px" }}>
+          <img src="src/assets/loghi/logo.svg" width={70} alt="" />
+        </div>
+        <div className="nav-top-home-info">
+          <div>
+            <h3>{userLogged.nome}</h3>
+            <h5>Livello {userLogged.livello}</h5>
+          </div>
+          <img
+            id="home-user-avatar"
+            src={userLogged.img}
+            alt="user-icon"
+            onClick={() => navTo("/account")}
+          />
+        </div>
+      </div>
+      <div className="home-wrapper" {...handlers}>
+        <div
+          className="home-carousel"
+          style={{
+            transform: `translateX(-${currentIndex * 100}%)`,
+            transition: "transform 0.3s ease-out",
+          }}
+        >
+          {parseEvents.map((evento, index) => (
+            <div key={evento.id} className="home-slide">
+              <div className="home">
+                <div className="nav-post">
+                  <div className="nav-post-user-info">
+                    <img
+                      id="post-avatar"
+                      src={personeRandom[index]?.img || userLogged.img}
+                      alt="user-icon"
+                    />
+                    <div className="post-info-container">
+                      <div className="post-user-info">
+                        <h3>{personeRandom[index]?.nome || userLogged.nome}</h3>
+                        <h5 style={{ color: "#f7a441" }}>Amici</h5>
+                        <a>
+                          <img
+                            id="post-settings-icon"
+                            src="\friends-svgrepo-com.svg"
+                            alt="post settings"
+                          />
+                        </a>
+                      </div>
+                      <h5>
+                        Livello{" "}
+                        {personeRandom[index]?.livello || userLogged.livello}
+                      </h5>
+                    </div>
+                  </div>
+                  <div className="icons-container">
+                    <button style={{ backgroundColor: "#0B4C3B" }}>Chat</button>
+                    <a>
+                      <img
+                        id="post-settings-icon"
+                        src="\dots-horizontal-svgrepo-com.svg"
+                        alt="post settings"
+                      />
+                    </a>
+                  </div>
+                </div>
+                <div className="descrizione-evento">
+                  <h3>{evento.nome_evento.toUpperCase()}</h3>
+                  <div className="start-finish-box">
+                    <div className="start-finish">
+                      <img src="src/assets/icons/start.svg" alt="start-flag" />
+                      <span>START</span>
+                      <p>{evento.start}</p>
+                    </div>
+                    <hr />
+                    <div className="start-finish">
+                      <img src="src/assets/icons/start.svg" alt="start-flag" />
+                      <span>FINISH</span>
+                      <p>{evento.finish}</p>
+                    </div>
+                  </div>
+                </div>
+                <div className="map-container">
+                  <img
+                    src={evento.img}
+                    width={290}
+                    alt="Mappa"
+                    className="mappa"
+                  />
+                </div>
+                <div className="container-partecipanti">
+                  <button className="red-btn">Difficile</button>
+                  <div className="icons-partecipanti">
+                    <img
+                      src="src\assets\icons\partecipanti.svg"
+                      width={70}
+                      alt="partecipanti"
+                    />
+                  </div>
+                  <span style={{ fontSize: 12 }}>
+                    {`${evento.partecipanti[0]} e altri ${
+                      evento.partecipanti.length - 1
+                    } stanno partecipando!`}
+                  </span>
+                </div>
+                <div className="info-percorso">
+                  <div className="info-box">
+                    <img src="src\assets\icons\kilometers.svg" alt="distanza" />
+                    <div className="info-box-text">
+                      <h3>{evento.distanza}</h3>
+                      <span>km</span>
+                    </div>
+                  </div>
+                  <hr />
+                  <div className="info-box">
+                    <img src="src\assets\icons\clock.svg" alt="orario" />
+                    <div className="info-box-text">
+                      <h3>{evento.orario}</h3>
+                      <span>hr</span>
+                    </div>
+                  </div>
+                  <hr />
+                  <div className="info-box">
+                    <img src="/src/assets/icons/calendar.svg" alt="data" />
+                    <div className="info-box-text">
+                      <h3>{evento.data}</h3>
+                      <span>data</span>
+                    </div>
+                  </div>
+                </div>
+                {!participatedEvents[evento.id] ? (
+                  <button
+                    onClick={() => handlePartecipa(evento)}
+                    style={{ fontSize: "18px", color: "white" }}
+                  >
+                    Partecipa!
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => handleRemovePartecipa(evento)}
+                    style={{
+                      fontSize: "18px",
+                      backgroundColor: "red",
+                      color: "white",
+                    }}
+                  >
+                    Abbandona
+                  </button>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="carousel-dots">
+        {parseEvents.map((_, index) => (
+          <span
+            key={index}
+            className={`dot ${index === currentIndex ? "active" : ""}`}
+            onClick={() => setCurrentIndex(index)}
+          />
+        ))}
+      </div>
+
+      {/* ------------------------------------ */}
+
+      <navbar className="nav-bottom-home">
+        <a>
+          <img
+            onClick={() => navTo("/impostazioni")}
+            src="src\assets\navbar\impostazioni.svg"
+            alt="impostazioni"
+          />
+        </a>
+
+        <a>
+          <img
+            src="src\assets\navbar\preferiti.svg"
+            alt="preferiti"
+            onClick={() => navTo("/eventipreferiti")}
+          />
+        </a>
+        <a id="nav-bottom-home-addEvent" onClick={() => navTo("/creaevento")}>
+          <img src="src\assets\navbar\addEvent.svg" alt="addEvent" />
+        </a>
+        <a onClick={() => navTo("/account")}>
+          <img
+            src="src/assets/navbar/utente.svg"
+            width={48}
+            alt="logo-utente"
+          />
+        </a>
+        <a>
+          <img src="src/assets/navbar/cerca.svg" width={48} alt="logo-utente" />
+        </a>
+      </navbar>
+    </div>
+  );
+}
