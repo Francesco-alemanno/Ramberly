@@ -1,7 +1,7 @@
 import { useContext, useEffect } from "react";
 import { useState } from "react";
 import { createContext } from "react";
-import { getEventsAvatar } from "../server/controllers/controllers";
+
 
 
 export const UserContext = createContext();
@@ -223,8 +223,7 @@ export function UserProvider({ children }) {
         setParticipatedEvents,
         eventsAvatar,
         usersAvatar,
-        fetchAllEvents,
-        
+        fetchAllEvents
       }}
     >
       {children}
