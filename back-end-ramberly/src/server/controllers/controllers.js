@@ -243,10 +243,9 @@ WHERE $1 = ANY(eventi.partecipanti)`,
 export const insertEvents = async (req, res) => {
   const { userId } = req.params;
   try {
-    const { nome_evento, start, finish,  distanza, orario, data } =
-      req.body;
-      const map_img = req.file.buffer
-     await db.none(
+    const { nome_evento, start, finish, distanza, orario, data } = req.body;
+    const map_img = req.file.buffer;
+    await db.none(
       `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data ) VALUES ($1, $2, $3, $4, $5, $6, $7,$8)`,
       [userId, nome_evento, start, finish, map_img, distanza, orario, data]
     );
@@ -256,7 +255,6 @@ export const insertEvents = async (req, res) => {
     res.status(500).json({ message: "Errore nel server" });
   }
 };
-
 
 export const updateEventUser = async (req, res) => {
   const { id, event_id } = req.body;

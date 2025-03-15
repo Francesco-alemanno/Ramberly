@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 export function Home() {
   const navTo = useNavigate();
 
-  // const [eventsAvatar, setEventsAvatar] = useState();
   const [eventParticipants, setEventParticipants] = useState({});
 
   const {
@@ -18,12 +17,11 @@ export function Home() {
     avatar,
     eventsAvatar,
     fetchAllEvents,
-    
   } = useUserContext();
-  useEffect(()=>{
-    fetchAllEvents()
-  },[participatedEvents])
 
+  useEffect(() => {
+    fetchAllEvents();
+  }, []);
 
   // logica carosello
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -55,10 +53,8 @@ export function Home() {
     }
     loadPartecipanti();
   }, [participatedEvents]);
-  useEffect(()=>{
-    console.log(participatedEvents)
-    },[participatedEvents])
-   
+  useEffect(() => {}, [participatedEvents]);
+
   return (
     <div className="home-container">
       <div className="nav-top-home">
@@ -90,8 +86,7 @@ export function Home() {
             const eventoAvatar = eventsAvatar?.find(
               (e) => e.id_evento === evento.id_evento
             );
-           
-            
+
             return (
               <div key={index} className="home-slide">
                 <div className="home">
@@ -158,7 +153,11 @@ export function Home() {
                   </div>
                   <div className="map-container">
                     <img
-                      src= {evento.map_img_base64 ? `data:image/png;base64,${evento.map_img_base64}` : "src/assets/placeholder.png"}
+                      src={
+                        evento.map_img_base64
+                          ? `data:image/png;base64,${evento.map_img_base64}`
+                          : "src/assets/placeholder.png"
+                      }
                       width={290}
                       alt="Mappa"
                       className="mappa"
@@ -196,7 +195,10 @@ export function Home() {
                     <div className="info-box">
                       <img src="src\assets\icons\clock.svg" alt="orario" />
                       <div className="info-box-text">
-                        <h3>{evento.orario.slice(0, 5)}</h3>
+                        <h3>
+                          {(evento.orario && evento.orario.slice(0, 5)) ||
+                            "--:--"}
+                        </h3>
                         <span>hr</span>
                       </div>
                     </div>
