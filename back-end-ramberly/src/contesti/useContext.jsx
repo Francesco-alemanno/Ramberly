@@ -187,23 +187,6 @@ export function UserProvider({ children }) {
     }
   }
 
-  // useEffect(() => {
-  //   async function getEventsAvatars() {
-  //     try {
-  //       const response = await fetch("http://localhost:5001/eventsAvatar");
-  //       if (response.ok) {
-  //         const responseData = await response.json();
-  //         setEventsAvatar(responseData);
-  //       } else {
-  //         throw new Error("Errore nel recupero degli Avatar degli eventi");
-  //       }
-  //     } catch (error) {
-  //       console.error(error);
-  //     }
-  //   }
-  //   getEventsAvatars();
-  // }, []);
-
   const fetchEventsAvatars = async () => {
     try {
       const response = await fetch("http://localhost:5001/eventsAvatar");

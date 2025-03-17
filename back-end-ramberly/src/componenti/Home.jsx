@@ -173,10 +173,14 @@ export function Home() {
                       />
                     </div>
                     <span style={{ fontSize: 12 }}>
-                      {eventParticipants[evento.id_evento]?.length > 0
+                      {eventParticipants[evento.id_evento]?.length > 1
                         ? `${eventParticipants[evento.id_evento][0]} e altri ${
                             eventParticipants[evento.id_evento].length - 1
                           } stanno partecipando!`
+                        : eventParticipants[evento.id_evento]?.length === 1
+                        ? `${
+                            eventParticipants[evento.id_evento][0]
+                          } sta partecipando!`
                         : "Nessun partecipante"}
                     </span>
                   </div>

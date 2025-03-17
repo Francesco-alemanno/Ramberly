@@ -213,7 +213,8 @@ export const getAllEvents = async (req, res) => {
     const events =
       await db.many(`SELECT eventi.*, users.nome,  COALESCE(encode(eventi.map_img, 'base64'), '') AS map_img_base64, users.livello 
       FROM eventi 
-      JOIN users ON eventi.id_creatore = users.id`);
+      JOIN users ON eventi.id_creatore = users.id
+      ORDER BY eventi.id_evento ASC`);
     return res.status(200).json(events);
   } catch (error) {
     return res.status(500).json({ message: "errore nella richiesta", error });
