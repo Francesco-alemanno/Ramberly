@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
 import { useSwipeable } from "react-swipeable";
 import { useEffect, useState } from "react";
+import { calculateDifficultyLevel } from "../algoritmi/calculateDifficultyLevel.js";
 
 export function Home() {
   const navTo = useNavigate();
@@ -164,11 +165,33 @@ export function Home() {
                     />
                   </div>
                   <div className="container-partecipanti">
-                    <button className="red-btn">Difficile</button>
+                    <button
+                      className="red-btn"
+                      style={{
+                        backgroundColor:
+                          calculateDifficultyLevel(user, evento.distanza) ===
+                          "Facile"
+                            ? "#4CAF50"
+                            : calculateDifficultyLevel(
+                                user,
+                                evento.distanza
+                              ) === "Intermedio"
+                            ? "#FFC107"
+                            : "#F44336",
+                      }}
+                    >
+                      {calculateDifficultyLevel(user, evento.distanza) ===
+                      "Facile"
+                        ? "Facile"
+                        : calculateDifficultyLevel(user, evento.distanza) ===
+                          "Intermedio"
+                        ? "Intermedio"
+                        : "Difficile"}
+                    </button>
                     <div className="icons-partecipanti">
                       <img
                         src="src\assets\icons\partecipanti.svg"
-                        width={70}
+                        width={60}
                         alt="partecipanti"
                       />
                     </div>

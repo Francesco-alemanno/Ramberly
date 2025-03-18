@@ -364,7 +364,6 @@ export function MapComponent(width) {
           .addTo(mapRef.current);
 
         setMarkerR(newMarker);
-        console.log("Chiamata a calculateRoute con:", [longitude, latitude]);
         // Calcolo il percorso verso la nuova posizione cercata
         setDestination([longitude, latitude]);
       } else {
@@ -432,23 +431,21 @@ export function MapComponent(width) {
   };
   const takeScreenshot = async () => {
     if (!mapContainerRef.current) return null;
-  
+
     return new Promise((resolve, reject) => {
       html2canvas(mapContainerRef.current, { scale: 4 }) // 🔥 Riduci la risoluzione
         .then((canvas) => {
           const base64Image = canvas.toDataURL("image/jpeg"); // 🔥 JPEG per ridurre dimensioni
-          console.log("🔍 Base64 generato:", base64Image); // 👀 Debug
           resolve(base64Image); // 🔥 Restituisce direttamente la stringa Base64
         })
         .catch(reject);
     });
   };
-  
+
   //con getAddress ci è possibile catturare la posizione di un marker e ricavare la via e il nome della citta.
   useEffect(() => {
     if (position && position.length === 2) {
       getAddressFromCoords(position[0], position[1]);
-      console.log(position[0], position[1]);
     }
   }, [position]);
 
@@ -469,7 +466,6 @@ export function MapComponent(width) {
           const address = `${street ? street.text : "Sconosciuto"}, ${
             place ? place.text : "Sconosciuto"
           }`;
-          console.log(address);
 
           setCountM2(address);
 
@@ -498,7 +494,6 @@ export function MapComponent(width) {
           const address = `${street ? street.text : "Sconosciuto"}, ${
             place ? place.text : "Sconosciuto"
           }`;
-          console.log(address);
 
           setCountM(address);
 

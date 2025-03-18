@@ -48,7 +48,7 @@ const setupDb = async () => {
         sesso TEXT,
         peso INTEGER,
         eta INTEGER CHECK (eta >= 18 AND eta <= 99),  
-        attivita TEXT,
+        attivita CHAR(1),
         monitoraggio TEXT,
         gruppo TEXT,
         sfide TEXT,
