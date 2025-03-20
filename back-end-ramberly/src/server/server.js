@@ -20,6 +20,7 @@ import {
   getEventiPreferiti,
   getEventsAvatar,
   getUsersAvatar,
+  updateUserScore,
 } from "./controllers/controllers.js";
 import passport from "passport";
 import "./passport.js";
@@ -58,13 +59,17 @@ app.get("/home", authorize, getLoggedUser);
 app.get("/users", getAllUsers);
 app.get("/events", getAllEvents);
 app.put("/events", updateEventUser);
-app.post("/events/:userId", upload.single('map_img'), insertEvents);
+app.post("/events/:userId", upload.single("map_img"), insertEvents);
 app.delete("/events", deleteEventUser);
 app.get("/events/:id_evento", getEventParticipants);
 app.get("/eventsAvatar", getEventsAvatar);
 
 // Eventi preferiti
 app.get("/eventiPreferiti/:userId", getEventiPreferiti);
+
+// update punteggio
+app.patch("/users/:userId", updateUserScore);
+
 // LISTEN
 app.listen(PORT, () => {
   console.log(`server in ascolto su http://localhost:${PORT}`);

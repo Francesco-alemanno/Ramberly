@@ -10,16 +10,19 @@ export function UserProvider({ children }) {
   const [users, setUsers] = useState([]);
   const [user, setUser] = useState({});
   const [events, setEvents] = useState([]);
+  const [avatar, setAvatar] = useState(null);
+  const [eventsAvatar, setEventsAvatar] = useState([]);
+  const [usersAvatar, setUsersAvatar] = useState();
+
+  // participatedEvents viene inizializzato come il map di tutti gli eventi creando per ogni evento la chiave "partecipa" a true se l'utente loggato partecipa, altrimenti a false.
   const [participatedEvents, setParticipatedEvents] = useState(
     events.map((evento) => ({
       ...evento,
       partecipa: evento.partecipanti.includes(user.id), // Se l'utente partecipa, true; altrimenti false
     }))
   );
-  const [avatar, setAvatar] = useState(null);
-  const [eventsAvatar, setEventsAvatar] = useState([]);
-  const [usersAvatar, setUsersAvatar] = useState();
 
+  // ad ogni cambiamento di events, questi vengono rimappati aggiornandone la chiave "partecipa" a true o false a seconda della presenza in quell'evento dell'id dell'utente loggato.
   useEffect(() => {
     const updatedEvents = events.map((evento) => ({
       ...evento,
@@ -143,8 +146,8 @@ export function UserProvider({ children }) {
       console.error({ message: "errore nel fetching", error });
     }
   };
-  // funzioni di aggiunta e rimozione eventi preferiti
-  async function handlePartecipa(idUser, idEvento) {
+  // aggiunta eventi preferiti
+  async function handlePartecipa(idUser, idEvento, combined) {
     const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
 
     try {
@@ -159,12 +162,31 @@ export function UserProvider({ children }) {
             event.id_evento === idEvento ? { ...event, partecipa: true } : event
           )
         );
+        handlePunteggio(idUser, combined);
       }
     } catch (error) {
       console.error(error);
     }
   }
 
+  //update punteggio
+  async function handlePunteggio(idUser, combined) {
+    const jsonData = JSON.stringify({ combinedScore: combined });
+    try {
+      const response = await fetch(`http://localhost:5001/users/${idUser}`, {
+        method: "PATCH",
+        body: jsonData,
+        headers: { "Content-Type": "application/json" },
+      });
+      if (!response.ok) {
+        throw new Error("Errore nell'update del punteggio utente");
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  }
+
+  // rimozione eventi preferiti
   async function handleDeletePartecipa(idUser, idEvento) {
     const jsonData = JSON.stringify({ id: idUser, event_id: idEvento });
     try {
@@ -187,6 +209,7 @@ export function UserProvider({ children }) {
     }
   }
 
+  // fetch avatars degli utenti creatori degli eventi
   const fetchEventsAvatars = async () => {
     try {
       const response = await fetch("http://localhost:5001/eventsAvatar");

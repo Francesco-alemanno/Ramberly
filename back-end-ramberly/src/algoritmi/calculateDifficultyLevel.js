@@ -35,10 +35,14 @@ export function calculateDifficultyLevel(user, distance) {
     return 100;
   };
 
-  const combined = subjectiveScore() * 0.5 + objectiveScore() * 0.5;
-  console.log(combined);
+  const combined = (subjectiveScore() * 0.5 + objectiveScore() * 0.5).toFixed(
+    1
+  );
+  // console.log(combined);
 
-  if (combined <= 40) return "Facile";
-  if (combined <= 60) return "Intermedio";
-  return "Difficile";
+  return {
+    level:
+      combined <= 40 ? "Facile" : combined <= 60 ? "Intermedio" : "Difficile",
+    score: parseFloat(combined), // Convertiamo in numero
+  };
 }

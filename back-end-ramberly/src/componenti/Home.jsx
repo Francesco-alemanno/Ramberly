@@ -169,22 +169,20 @@ export function Home() {
                       className="red-btn"
                       style={{
                         backgroundColor:
-                          calculateDifficultyLevel(user, evento.distanza) ===
-                          "Facile"
+                          calculateDifficultyLevel(user, evento.distanza)
+                            .level === "Facile"
                             ? "#4CAF50"
-                            : calculateDifficultyLevel(
-                                user,
-                                evento.distanza
-                              ) === "Intermedio"
+                            : calculateDifficultyLevel(user, evento.distanza)
+                                .level === "Intermedio"
                             ? "#FFC107"
                             : "#F44336",
                       }}
                     >
-                      {calculateDifficultyLevel(user, evento.distanza) ===
+                      {calculateDifficultyLevel(user, evento.distanza).level ===
                       "Facile"
                         ? "Facile"
-                        : calculateDifficultyLevel(user, evento.distanza) ===
-                          "Intermedio"
+                        : calculateDifficultyLevel(user, evento.distanza)
+                            .level === "Intermedio"
                         ? "Intermedio"
                         : "Difficile"}
                     </button>
@@ -241,7 +239,17 @@ export function Home() {
                   </div>
                   {!evento.partecipa ? (
                     <button
-                      onClick={() => handlePartecipa(user.id, evento.id_evento)}
+                      onClick={() => {
+                        const difficultyData = calculateDifficultyLevel(
+                          user,
+                          evento.distanza
+                        );
+                        handlePartecipa(
+                          user.id,
+                          evento.id_evento,
+                          difficultyData.score
+                        );
+                      }}
                       style={{ fontSize: "18px", color: "white" }}
                     >
                       Partecipa!
@@ -253,7 +261,7 @@ export function Home() {
                       }
                       style={{
                         fontSize: "18px",
-                        backgroundColor: "red",
+                        backgroundColor: "#F44336",
                         color: "white",
                       }}
                     >

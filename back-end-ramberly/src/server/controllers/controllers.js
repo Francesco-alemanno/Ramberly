@@ -253,7 +253,7 @@ export const insertEvents = async (req, res) => {
     return res.status(200).json({ message: "Evento aggiunto" });
   } catch (err) {
     console.error("Errore nei dati inseriti");
-    res.status(500).json({ message: "Errore nel server" });
+    res.status(500).json({ message: "Errore nel server", err });
   }
 };
 
@@ -340,6 +340,25 @@ export const logout = async (req, res) => {
     res.status(200).json({ message: "logout successfull" });
   } catch (error) {
     console.error("logout error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+//update punteggio
+export const updateUserScore = async (req, res) => {
+  const { userId } = req.params;
+  const { combinedScore } = req.body;
+  // console.log("ID ricevuto:", userId); // Verifica l'ID ricevuto
+  // console.log("Punteggio ricevuto:", combinedScore); // Verifica il punteggio ricevuto
+  try {
+    await db.none(
+      `UPDATE users 
+      SET punteggio = punteggio + $2
+      WHERE id = $1`,
+      [userId, combinedScore]
+    );
+  } catch (error) {
+    console.error("Error during updating user score", error);
     res.status(500).json({ message: "Internal server error" });
   }
 };
