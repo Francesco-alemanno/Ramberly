@@ -131,14 +131,14 @@ export function Home() {
                     </div>
                   </div>
                   <div className="descrizione-evento">
-                    <h3>{evento.nome_evento}</h3>
+                    <h3>{evento.nome_evento.toUpperCase()}</h3>
                     <div className="start-finish-box">
                       <div className="start-finish">
                         <img
                           src="src/assets/icons/start.svg"
                           alt="start-flag"
                         />
-                        <span>START</span>
+                        <div>START</div>
                         <p>{evento.start}</p>
                       </div>
                       <hr />
@@ -147,7 +147,7 @@ export function Home() {
                           src="src/assets/icons/start.svg"
                           alt="start-flag"
                         />
-                        <span>FINISH</span>
+                        <div>FINISH</div>
                         <p>{evento.finish}</p>
                       </div>
                     </div>
@@ -166,7 +166,7 @@ export function Home() {
                   </div>
                   <div className="container-partecipanti">
                     <button
-                      className="red-btn"
+                      className="btn-difficolta"
                       style={{
                         backgroundColor:
                           calculateDifficultyLevel(user, evento.distanza)
@@ -193,7 +193,7 @@ export function Home() {
                         alt="partecipanti"
                       />
                     </div>
-                    <span style={{ fontSize: 12 }}>
+                    <div className="participants-description" >
                       {eventParticipants[evento.id_evento]?.length > 1
                         ? `${eventParticipants[evento.id_evento][0]} e altri ${
                             eventParticipants[evento.id_evento].length - 1
@@ -203,7 +203,7 @@ export function Home() {
                             eventParticipants[evento.id_evento][0]
                           } sta partecipando!`
                         : "Nessun partecipante"}
-                    </span>
+                    </div>
                   </div>
                   <div className="info-percorso">
                     <div className="info-box">
@@ -213,7 +213,7 @@ export function Home() {
                       />
                       <div className="info-box-text">
                         <h3>{evento.distanza}</h3>
-                        <span>km</span>
+                        <div>km</div>
                       </div>
                     </div>
                     <hr />
@@ -224,7 +224,7 @@ export function Home() {
                           {(evento.orario && evento.orario.slice(0, 5)) ||
                             "--:--"}
                         </h3>
-                        <span>hr</span>
+                        <div>hr</div>
                       </div>
                     </div>
                     <hr />
@@ -233,7 +233,7 @@ export function Home() {
                       <div className="info-box-text">
                         <h3>{new Date(evento.data).toLocaleDateString()}</h3>{" "}
                         {/*Riconvertiamo in sola data*/}
-                        <span>data</span>
+                        <div>data</div>
                       </div>
                     </div>
                   </div>
@@ -276,7 +276,7 @@ export function Home() {
       </div>
       <div className="carousel-dots">
         {participatedEvents.map((_, index) => (
-          <span
+          <div
             key={index}
             className={`dot ${index === currentIndex ? "active" : ""}`}
             onClick={() => setCurrentIndex(index)}

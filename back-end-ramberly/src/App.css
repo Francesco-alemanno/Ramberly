@@ -285,18 +285,12 @@ button {
   display: flex;
   justify-content: space-around;
   align-items: center;
-  gap: 5px;
+  gap: 0.5rem;
   width: 100%;
 }
-.container-partecipanti button {
-  border-radius: var(--border-radius);
-  padding: var(--padding-difficolta);
-  background-color: var(--btn-color-hard-difficolta);
-  border: none;
-  font-size: 18px;
-  color: white;
-  width: 5rem;
-  font-family: "Avenir-light";
+.participants-description {
+  font-size: 12px;
+  width: 33%;
 }
 
 .icons-partecipanti {
@@ -747,12 +741,23 @@ h3 {
   justify-content: space-around;
   align-items: center;
 }
+
 .eventi-preferiti {
-  border: var(--border);
   border-radius: var(--border-radius);
   padding: var(--padding);
+  box-shadow: var(--box-shadow);
+  margin: 5px;
   background-color: var(--form-bg-color);
   margin-top: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+  font-size: clamp(0.5rem, 85%, 1rem);
+}
+
+.post-info-container {
+  text-align: left;
 }
 .title-preferiti {
   display: flex;
@@ -763,7 +768,13 @@ h3 {
   padding: var(--padding);
   color: white;
 }
-
+.info-start-finish {
+  display: flex;
+  justify-content: space-between;
+}
+.info-start-finish div {
+  width: 50%;
+}
 .title-preferiti a {
   position: relative;
   right: 105px;
@@ -771,25 +782,42 @@ h3 {
 
 .info-evento-preferiti {
   display: flex;
-  gap: 10px;
-  margin-top: 10px;
   justify-content: center;
+  gap: 5px;
 }
 .map-preferiti {
   display: flex;
+  width: 50%;
   justify-content: center;
   align-items: center;
+}
+.map-preferiti img {
+  width: 100%;
 }
 
 .box-dati-preferiti {
   display: flex;
   gap: 10px;
-  align-items: center;
-  padding: 10px;
+  width: 50%;
+  align-items: start;
+  justify-content: space-evenly;
+  flex-direction: column;
   border-radius: 8px;
   border: var(--border);
-  margin-right: 5px;
   background-color: var(--secondary-color);
+}
+.box-dati-preferiti p {
+  font-family: "Avenir-Heavy";
+  font-size: 15px;
+  width: 25%;
+}
+
+.info-data-icons {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 75%;
 }
 
 .btn-eventi-preferiti {
@@ -799,25 +827,15 @@ h3 {
   padding: 8px;
 }
 
-.red-btn {
+.btn-difficolta {
   margin: 0;
   border-radius: var(--border-radius);
-  padding: 5px;
+  padding: 10px;
   background-color: var(--btn-color-hard-difficolta);
   border: none;
   font-size: 18px;
   color: white;
-  width: 5rem;
-  font-family: "Avenir-Heavy";
-}
-.btn-facile {
-  border-radius: var(--border-radius);
-  padding: 5px;
-  background-color: var(--primary-color);
-  border: none;
-  font-size: 18px;
-  color: white;
-  width: 5rem;
+  width: auto;
   font-family: "Avenir-Heavy";
 }
 

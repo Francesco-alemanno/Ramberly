@@ -6,7 +6,7 @@ import { fileURLToPath } from "url";
 dotenv.config();
 const URL = process.env.URL;
 
-export const db = pgPromise()(URL);
+// export const db = pgPromise()(URL);
 
 // export const db = pgPromise()(
 //   "postgresql://team_user:Ramberly31@130.25.236.251:5432/team_db?schema=public"
@@ -35,44 +35,55 @@ const avatars = {
 const setupDb = async () => {
   try {
     await db.none(`
-      CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        nome TEXT,
-        cognome TEXT,
-        email TEXT UNIQUE,
-        password TEXT,
-        token TEXT,
-        punteggio NUMERIC(4,1) DEFAULT 1.0,
-        livello INTEGER GENERATED ALWAYS AS (FLOOR(punteggio)) STORED,
-        img BYTEA, 
-        sesso TEXT,
-        peso INTEGER,
-        eta INTEGER CHECK (eta >= 18 AND eta <= 99),  
-        attivita CHAR(1),
-        monitoraggio TEXT,
-        gruppo TEXT,
-        sfide TEXT,
-        running BOOLEAN,
-        escursione BOOLEAN,
-        biking BOOLEAN,
-        camminata BOOLEAN,
-        seguiti INTEGER[] DEFAULT ARRAY[]::INTEGER[],
-        seguaci INTEGER[] DEFAULT ARRAY[]::INTEGER[]
-      );
+     CREATE TABLE IF NOT EXISTS users (
+  id SERIAL PRIMARY KEY,
+  nome TEXT,
+  cognome TEXT,
+  email TEXT UNIQUE,
+  password TEXT,
+  token TEXT,
+  punteggio NUMERIC(6,1) DEFAULT 1.0,
+  livello INTEGER , 
+  img BYTEA, 
+  sesso TEXT,
+  peso INTEGER,
+  eta INTEGER CHECK (eta >= 18 AND eta <= 99),  
+  attivita CHAR(1),
+  monitoraggio TEXT,
+  gruppo TEXT,
+  sfide TEXT,
+  running BOOLEAN,
+  escursione BOOLEAN,
+  biking BOOLEAN,
+  camminata BOOLEAN,
+  seguiti INTEGER[] DEFAULT ARRAY[]::INTEGER[],
+  seguaci INTEGER[] DEFAULT ARRAY[]::INTEGER[]
+);
+
     `);
     await db.none(
       `CREATE OR REPLACE FUNCTION update_livello()
-      RETURNS TRIGGER AS $$
-      BEGIN
-        NEW.livello := FLOOR(NEW.punteggio);
-        RETURN NEW;
-      END;
-      $$ LANGUAGE plpgsql;
+RETURNS TRIGGER AS $$
+DECLARE
+    incremento_livello INTEGER;
+BEGIN
+    -- Calcola quanti livelli completi ci sono nel nuovo punteggio
+    incremento_livello := FLOOR(NEW.punteggio / 100);
 
-      CREATE TRIGGER trigger_update_livello
-      BEFORE INSERT OR UPDATE ON users
-      FOR EACH ROW
-      EXECUTE FUNCTION update_livello();`
+    -- Incrementa il livello
+    NEW.livello := COALESCE(OLD.livello, 1) + incremento_livello;
+
+    -- Resetta il punteggio mantenendo il resto
+    NEW.punteggio := NEW.punteggio - (incremento_livello * 100);
+
+    RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER trigger_update_livello
+BEFORE INSERT OR UPDATE OF punteggio ON users
+FOR EACH ROW
+EXECUTE FUNCTION update_livello();`
     );
     await db.none(
       `INSERT INTO users (nome, cognome, email, password, punteggio, img, sesso, peso, eta, attivita, monitoraggio, gruppo, sfide, running, escursione, biking, camminata, seguiti, seguaci)
@@ -91,7 +102,7 @@ const setupDb = async () => {
         "Rossi",
         "luca.rossi@email.com",
         "Pass123!",
-        12.5,
+        1250.0,
         readImage(avatars.luca),
         "M",
         75,
@@ -110,7 +121,7 @@ const setupDb = async () => {
         "Bianchi",
         "giulia.bianchi@email.com",
         "Pass123",
-        24.3,
+        2430.0,
         readImage(avatars.giulia),
         "F",
         60,
@@ -129,7 +140,7 @@ const setupDb = async () => {
         "Neri",
         "sara.neri@email.com",
         "Pass123",
-        17.8,
+        1780.0,
         readImage(avatars.sara),
         "F",
         55,
@@ -148,7 +159,7 @@ const setupDb = async () => {
         "Gialli",
         "davide.gialli@email.com",
         "Pass123",
-        29.4,
+        2940.0,
         readImage(avatars.davide),
         "M",
         85,
@@ -167,7 +178,7 @@ const setupDb = async () => {
         "Blu",
         "elisa.blu@email.com",
         "Pass123",
-        8.9,
+        3880.0,
         readImage(avatars.elisa),
         "F",
         68,
@@ -186,7 +197,7 @@ const setupDb = async () => {
         "Viola",
         "antonio.viola@email.com",
         "Pass123",
-        21.7,
+        2170.0,
         readImage(avatars.antonio),
         "M",
         90,
@@ -205,7 +216,7 @@ const setupDb = async () => {
         "Marrone",
         "federico.marrone@email.com",
         "Pass123",
-        14.2,
+        1420.0,
         readImage(avatars.federico),
         "M",
         78,
@@ -224,7 +235,7 @@ const setupDb = async () => {
         "Grigio",
         "chiara.grigio@email.com",
         "Pass123",
-        26.8,
+        2680.0,
         readImage(avatars.chiara),
         "F",
         62,
@@ -259,47 +270,47 @@ const setupDb = async () => {
         difficolta CHAR(1)
       );
     `);
-    // await db.none(
-    //   `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data, partecipanti, privacy, difficolta) VALUES
-    //   ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11),
-    //   ($12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22),
-    //   ($23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)`,
-    //   [
-    //     1,
-    //     "corsetta mattutina",
-    //     "Via della Moscova, Milano",
-    //     "Corso Como, Milano",
-    //     readImage("../assets/placeholder-mappa/map-placeholder.png"),
-    //     12.2,
-    //     "16:00",
-    //     "2025-02-24",
-    //     [2, 3],
-    //     "1",
-    //     null,
-    //     2,
-    //     "corsetta pomeridiana",
-    //     "Via del Corso, Roma",
-    //     "Via dei Condotti, Roma",
-    //     readImage("../assets/placeholder-mappa/map-placeholder(2).png"),
-    //     8.1,
-    //     "15:00",
-    //     "2025-01-18",
-    //     [4, 5],
-    //     "1",
-    //     null,
-    //     3,
-    //     "passeggiata notturna",
-    //     "Via Roma, Torino",
-    //     "Via Trinchese, Torino",
-    //     readImage("../assets/placeholder-mappa/map-placeholder(3).png"),
-    //     4.4,
-    //     "10:00",
-    //     "2025-04-05",
-    //     [6, 7, 8],
-    //     "1",
-    //     null,
-    //   ]
-    // );
+    await db.none(
+      `INSERT INTO eventi (id_creatore, nome_evento, start, finish, map_img, distanza, orario, data, partecipanti, privacy, difficolta) VALUES
+      ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11),
+      ($12, $13, $14, $15, $16, $17, $18, $19, $20, $21, $22),
+      ($23, $24, $25, $26, $27, $28, $29, $30, $31, $32, $33)`,
+      [
+        1,
+        "corsetta mattutina",
+        "Via della Moscova, Milano",
+        "Corso Como, Milano",
+        readImage("../assets/placeholder-mappa/map-placeholder.png"),
+        12.2,
+        "16:00",
+        "2025-02-24",
+        [2, 3],
+        "1",
+        null,
+        2,
+        "corsetta pomeridiana",
+        "Via del Corso, Roma",
+        "Via dei Condotti, Roma",
+        readImage("../assets/placeholder-mappa/map-placeholder(2).png"),
+        8.1,
+        "15:00",
+        "2025-01-18",
+        [4, 5],
+        "1",
+        null,
+        3,
+        "passeggiata notturna",
+        "Via Roma, Torino",
+        "Via Trinchese, Torino",
+        readImage("../assets/placeholder-mappa/map-placeholder(3).png"),
+        4.4,
+        "10:00",
+        "2025-04-05",
+        [6, 7, 8],
+        "1",
+        null,
+      ]
+    );
 
     console.log("Tabelle create correttamente");
   } catch (error) {

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useUserContext } from "../contesti/useContext";
-
+import { calculateDifficultyLevel } from "../algoritmi/calculateDifficultyLevel.js";
 export function EventiPreferiti() {
   const { user, participatedEvents, handleDeletePartecipa, eventsAvatar } =
     useUserContext();
@@ -63,24 +63,38 @@ export function EventiPreferiti() {
                     </div>
                     <h5>Livello {evento.livello}</h5>
                   </div>
-                  <p>{evento.nome_evento}</p>
+                  <p style={{ fontFamily: 'Avenir-Medium', fontSize:'14px' }}>
+                    {evento.nome_evento.toUpperCase()}
+                  </p>
                 </div>
-                <div>
-                  <p>{evento.start}</p>
-                  <p>{evento.finish}</p>
+                <div className="info-start-finish">
+                  <div>
+                    <p style={{fontFamily: 'Avenir-Heavy'}}>Start:</p>
+                    <p> {evento.start}</p>
+                  </div>
+
+                  <hr />
+                  <div>
+                    <p style={{fontFamily: 'Avenir-Heavy'}}>Finish:</p>
+                    <p>{evento.finish}</p>
+                  </div>
                 </div>
 
                 <div className="info-evento-preferiti">
                   <div className="map-preferiti">
                     <img
-                      src= {evento.map_img_base64 ? `data:image/png;base64,${evento.map_img_base64}` : "src/assets/placeholder.png"}
-                      width={150}
+                      src={
+                        evento.map_img_base64
+                          ? `data:image/png;base64,${evento.map_img_base64}`
+                          : "src/assets/placeholder.png"
+                      }
                       alt="Mappa"
                       className="mappa"
                     />
                   </div>
+
                   <div className="box-dati-preferiti">
-                    <div className="km-preferiti">
+                    <div className="info-data-icons">
                       <img
                         src="src\assets\icons\kilometers.svg"
                         alt="distanza"
@@ -88,7 +102,7 @@ export function EventiPreferiti() {
                       />
                       <p>{evento.distanza}</p>
                     </div>
-                    <div className="orario-preferiti">
+                    <div className="info-data-icons">
                       <img
                         src="src\assets\icons\clock.svg"
                         alt="orario"
@@ -96,7 +110,7 @@ export function EventiPreferiti() {
                       />
                       <p>{evento.orario.slice(0, -3)}</p>
                     </div>
-                    <div className="data-preferiti">
+                    <div className="info-data-icons">
                       <img
                         src="src\assets\icons\calendar.svg"
                         alt="data"
@@ -107,12 +121,32 @@ export function EventiPreferiti() {
                   </div>
                 </div>
                 <div className="btn-eventi-preferiti">
-                  <button className="btn-facile">Facile</button>
+                  <button
+                    className="btn-difficolta"
+                    style={{
+                      backgroundColor:
+                        calculateDifficultyLevel(user, evento.distanza)
+                          .level === "Facile"
+                          ? "#4CAF50"
+                          : calculateDifficultyLevel(user, evento.distanza)
+                              .level === "Intermedio"
+                          ? "#FFC107"
+                          : "#F44336",
+                    }}
+                  >
+                    {calculateDifficultyLevel(user, evento.distanza).level ===
+                    "Facile"
+                      ? "Facile"
+                      : calculateDifficultyLevel(user, evento.distanza)
+                          .level === "Intermedio"
+                      ? "Intermedio"
+                      : "Difficile"}
+                  </button>
                   <button
                     onClick={() =>
                       handleDeletePartecipa(user.id, evento.id_evento)
                     }
-                    className="red-btn"
+                    className="btn-difficolta"
                   >
                     Rimuovi
                   </button>

@@ -163,6 +163,7 @@ export function UserProvider({ children }) {
           )
         );
         handlePunteggio(idUser, combined);
+        fetchUserLogged()
       }
     } catch (error) {
       console.error(error);
