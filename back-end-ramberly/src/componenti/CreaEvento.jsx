@@ -157,7 +157,10 @@ export function CreaEvento() {
         <div className="cerca-evento"></div>
 
         {/* ----------------------- */}
-        <div className="map-container">
+        <div
+          className="map-container"
+          style={{ position: "relative", zIndex: 1 }}
+        >
           <div className="map">
             <div>
               <div className="search-location">
@@ -265,7 +268,14 @@ export function CreaEvento() {
                 <div
                   id="map-box"
                   ref={mapContainerRef}
-                  style={{ width: "100%", height: "500px" }}
+                  className="mapbox-container"
+                  style={{
+                    width: "100%",
+                    height: "20rem",
+                    position: "relative",
+                    left: 0,
+                    overflow: "hidden",
+                  }}
                 />
               ) : (
                 <p>Loading map...</p>

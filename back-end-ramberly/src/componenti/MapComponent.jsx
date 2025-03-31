@@ -1,10 +1,9 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import { useNavigate } from "react-router-dom";
 import html2canvas from "html2canvas";
 
-export function MapComponent(width) {
+export function MapComponent() {
   //impostiamo i riferimenti per la manipolzione della mappa e per la gestione del suo conteniutore
   const mapRef = useRef();
   const mapContainerRef = useRef();
@@ -24,7 +23,6 @@ export function MapComponent(width) {
   const [searchQueryR, setSearchQueryR] = useState(""); // Stato per la query di ricerca
   const [markerR, setMarkerR] = useState(null); // Per tenere traccia del marker aggiunto
   const [suggestionsR, setSuggestionsR] = useState([]); // Stato per memorizzare i suggerimenti
-  const navTo = useNavigate();
 
   useEffect(() => {
     //controllo l'esistenza di navigator.geolocation prima di andare a recuperare le informazioni delle coordinate
@@ -429,17 +427,78 @@ export function MapComponent(width) {
 
     // Calcoliamo il percorso
   };
-  const takeScreenshot = async () => {
-    if (!mapContainerRef.current) return null;
+  // const takeScreenshot = async () => {
+  //   if (!mapContainerRef.current) return null;
+  //   const { scrollWidth, scrollHeight } = mapContainerRef.current;
 
-    return new Promise((resolve, reject) => {
-      html2canvas(mapContainerRef.current, { scale: 4 }) // 🔥 Riduci la risoluzione
-        .then((canvas) => {
-          const base64Image = canvas.toDataURL("image/jpeg"); // 🔥 JPEG per ridurre dimensioni
-          resolve(base64Image); // 🔥 Restituisce direttamente la stringa Base64
-        })
-        .catch(reject);
-    });
+  //   return new Promise((resolve, reject) => {
+  //     html2canvas(mapContainerRef.current, {
+  //       width: scrollWidth,
+  //       height: scrollHeight,
+  //       scale: 1,
+  //     }) // 🔥 Riduci la risoluzione
+  //       .then((canvas) => {
+  //         const base64Image = canvas.toDataURL("image/jpeg"); // 🔥 JPEG per ridurre dimensioni
+  //         resolve(base64Image); // 🔥 Restituisce direttamente la stringa Base64
+  //       })
+  //       .catch(reject);
+  //   });
+  // };
+  const takeScreenshot = async () => {
+    if (!mapContainerRef.current || !mapRef.current) return null;
+
+    // Salva lo stato originale della mappa
+    const originalZoom = mapRef.current.getZoom();
+    const originalCenter = mapRef.current.getCenter();
+    const originalPadding = mapRef.current.getPadding();
+
+    try {
+      // Imposta un padding per mantenere il percorso visibile
+      mapRef.current.setPadding(40, 40, 0, 0);
+
+      // Calcola i bounds del percorso se esiste
+      const routeSource = mapRef.current.getSource("route");
+      if (routeSource) {
+        const routeData = routeSource._data;
+        const coordinates = routeData.geometry.coordinates;
+
+        const bounds = coordinates.reduce(
+          (bounds, coord) => bounds.extend(coord),
+          new mapboxgl.LngLatBounds(coordinates[0], coordinates[0])
+        );
+
+        // Applica un fitBounds con zoom ridotto
+        mapRef.current.fitBounds(bounds, {
+          padding: 50,
+          maxZoom: 20, // Regola questo valore per lo zoom desiderato
+          duration: 0,
+        });
+      } else {
+        // Zoom di default se non c'è percorso
+        mapRef.current.setZoom(12);
+      }
+
+      // Aspetta il completamento del rendering
+      await new Promise((resolve) => mapRef.current.once("idle", resolve));
+
+      // Cattura lo screenshot
+      const { scrollWidth, scrollHeight } = mapContainerRef.current;
+      const canvas = await html2canvas(mapContainerRef.current, {
+        width: scrollWidth,
+        height: scrollHeight,
+        scale: 1,
+        useCORS: true,
+      });
+
+      return canvas.toDataURL("image/jpeg");
+    } finally {
+      // Ripristina lo stato originale
+      mapRef.current.jumpTo({
+        zoom: originalZoom,
+        center: originalCenter,
+      });
+      mapRef.current.setPadding(originalPadding);
+    }
   };
 
   //con getAddress ci è possibile catturare la posizione di un marker e ricavare la via e il nome della citta.
@@ -535,77 +594,4 @@ export function MapComponent(width) {
     clickMap,
     position,
   };
-  // <>
-  //   <div>
-  //     <div className="search-location">
-  //       <a className="link-class" onClick={() => navTo("/home")}>
-  //         <svg
-  //           width="20"
-  //           height="20"
-  //           viewBox="0 0 18 28"
-  //           aria-hidden="true"
-  //           xmlns="http://www.w3.org/2000/svg"
-  //         >
-  //           <path
-  //             d="M1.825 28L18 14 1.825 0 0 1.715 14.196 14 0 26.285z"
-  //             fill="currentColor"
-  //           ></path>
-  //         </svg>
-  //       </a>
-  //       <input
-  //         type="text"
-  //         placeholder="Cerca un luogo..."
-  //         value={searchQuery}
-  //         onChange={(e) => {
-  //           setSearchQuery(e.target.value);
-  //           handleSearch();
-  //         }}
-  //       />
-  //       <button className="btn-search" onClick={handleSearch}>
-  //         Cerca
-  //       </button>
-  //     </div>
-
-  //     {/* Mostriamo i suggerimenti sotto il campo di ricerca */}
-  //     {suggestions.length > 0 && (
-  //       <ul className="suggestions-list">
-  //         {suggestions.map((suggestion, index) => (
-  //           <li
-  //             key={index}
-  //             onClick={() => handleSuggestionSelect(suggestion)}
-  //           >
-  //             {suggestion.place_name}
-  //           </li>
-  //         ))}
-  //       </ul>
-  //     )}
-  //   </div>
-
-  //   {userLocation ? (
-  //     <div
-  //       id="map-box"
-  //       ref={mapContainerRef}
-  //       style={{ width, height: "500px" }}
-  //     />
-  //   ) : (
-  //     <p>Loading map...</p>
-  //   )}
-
-  //   <button className="map-reset-btm" onClick={handleResetPosition}>
-  //     Reset Position
-  //   </button>
-  //   <button
-  //     className="map-add-marker-btm"
-  //     onClick={() => mapRef.current.on("click", handleMapClick)}
-  //   >
-  //     Add Marker
-  //   </button>
-  //   <button onClick={takeScreenshot}>create screenshot</button>
-
-  //   {distance && (
-  //     <div>
-  //       <p>Distance: {distance} km</p>
-  //     </div>
-  //   )}
-  // </>
 }

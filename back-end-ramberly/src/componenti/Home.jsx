@@ -118,7 +118,7 @@ export function Home() {
                       </div>
                     </div>
                     <div className="icons-container">
-                      <button style={{ backgroundColor: "#0B4C3B" }}>
+                      <button style={{ backgroundColor: "#0B4C3B", margin: 0 }}>
                         Chat
                       </button>
                       <a>
@@ -131,23 +131,30 @@ export function Home() {
                     </div>
                   </div>
                   <div className="descrizione-evento">
-                    <h3>{evento.nome_evento.toUpperCase()}</h3>
+                    <h3>
+                      {evento.nome_evento && evento.nome_evento.toUpperCase()}
+                    </h3>
                     <div className="start-finish-box">
                       <div className="start-finish">
-                        <img
-                          src="src/assets/icons/start.svg"
-                          alt="start-flag"
-                        />
-                        <div>START</div>
+                        <div className="flag-start-finish">
+                          <img
+                            src="src/assets/icons/start.svg"
+                            alt="start-flag"
+                          />
+                          <div>START</div>
+                        </div>
                         <p>{evento.start}</p>
                       </div>
                       <hr />
                       <div className="start-finish">
-                        <img
-                          src="src/assets/icons/start.svg"
-                          alt="start-flag"
-                        />
-                        <div>FINISH</div>
+                        <div className="flag-start-finish">
+                          <img
+                            src="src/assets/icons/start.svg"
+                            alt="start-flag"
+                          />
+                          <div>FINISH</div>
+                        </div>
+
                         <p>{evento.finish}</p>
                       </div>
                     </div>
@@ -159,7 +166,7 @@ export function Home() {
                           ? `data:image/png;base64,${evento.map_img_base64}`
                           : "src/assets/placeholder.png"
                       }
-                      width={290}
+                      width="100%"
                       alt="Mappa"
                       className="mappa"
                     />
@@ -193,7 +200,7 @@ export function Home() {
                         alt="partecipanti"
                       />
                     </div>
-                    <div className="participants-description" >
+                    <div className="participants-description">
                       {eventParticipants[evento.id_evento]?.length > 1
                         ? `${eventParticipants[evento.id_evento][0]} e altri ${
                             eventParticipants[evento.id_evento].length - 1
@@ -250,7 +257,7 @@ export function Home() {
                           difficultyData.score
                         );
                       }}
-                      style={{ fontSize: "18px", color: "white" }}
+                      style={{ color: "white" }}
                     >
                       Partecipa!
                     </button>
