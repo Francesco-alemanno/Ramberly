@@ -280,9 +280,9 @@ export function CreaEvento() {
               ) : (
                 <p>Loading map...</p>
               )}
-              <div className="maps-button">
+              <div className="map-btn">
                 <button
-                  className="map-reset-btm"
+                  className="map-reset-btn"
                   type="button"
                   onClick={handleResetPosition}
                 >
@@ -290,7 +290,7 @@ export function CreaEvento() {
                 </button>
                 <button
                   type="button"
-                  className="map-add-marker-btm"
+                  className="map-add-marker-btn"
                   onClick={() => mapRef.current.on("click", clickMap)}
                 >
                   Add Marker

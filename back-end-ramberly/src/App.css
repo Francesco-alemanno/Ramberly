@@ -83,7 +83,8 @@ button {
   padding: var(--padding);
   padding: 10px;
   font-family: "Avenir-heavy";
-  font-size: clamp(5vw, 5vw, 1rem);
+  /* font-size: clamp(2.5vw, 5vw, 1rem); */
+  font-size: 20px;
   background-color: var(--primary-color);
   color: black;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
@@ -125,7 +126,7 @@ button {
   align-items: start;
   gap: 10px;
   text-align: left;
-  font-size: clamp(2.5vw, 5vw, 1rem);
+  font-size: clamp(2vw, 4vw, 1rem);
 }
 
 .nav-top-home-info > div {
@@ -302,7 +303,7 @@ button {
 
 .maps-button button {
   z-index: 2; /* Assicura che i pulsanti siano sopra la mappa */
-  position: relative;
+  /* position: relative; */
 }
 
 .mapboxgl-control-container {
@@ -690,19 +691,23 @@ h3 {
   flex-direction: column;
 }
 
-.maps-button {
+.map-btn {
+  width: 40%;
+  max-width: 10rem;
   position: absolute;
-  bottom: 150px;
-  left: 230px;
-
-  width: 35%;
-  top: 695px;
+  bottom: 10px;
+  right: 10px;
 }
-.maps-button button {
+
+.map-btn button {
   background-color: var(--secondary-color);
   color: black;
   font-family: "Avenir-Light";
+  font-size: 15px;
+  white-space: nowrap;
+  opacity: 0.9;
 }
+
 .event-items {
   display: flex;
   flex-direction: column;
